@@ -22,44 +22,6 @@ Given a GitHub issue and the codebase at the pre-fix commit, the system:
 4. Validates the test with **F→P semantics** — the test must *fail* on the base (buggy) commit and *pass* on the fixed commit
 5. If validation fails, attempts up to 3 repair rounds using execution output as feedback
 
-## Reproduction
-
-### Prerequisites
-
-- Docker
-- Python >= 3.10
-- Mistral API key (`MISTRAL_API_KEY`)
-
-### Setup
-
-```bash
-git clone https://github.com/jie-m-zhang/Devstral-testgen
-cd Devstral-testgen
-pip install swt-bench
-```
-
-### Run
-
-```bash
-python -m test_generation_swt.run \
-    --config-path config.json \
-    --dataset lite \
-    --use-docker
-```
-
-`config.json`:
-```json
-{
-  "llm_provider_name": "MistralAI",
-  "model_config": {
-    "model_name": "devstral-2512",
-    "temperature": 0.0
-  },
-  "max_workers": 30,
-  "instance_timeout": 600
-}
-```
-
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](./LICENSE) file for details.
