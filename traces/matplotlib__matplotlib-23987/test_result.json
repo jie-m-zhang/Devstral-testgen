@@ -1,0 +1,16 @@
+{
+  "instance_id": "matplotlib__matplotlib-23987",
+  "base_image": "exec.eval.x86_64.2d6052d0094739c9380d87.16871ca049efd673901ba9:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py\n--- a/lib/matplotlib/figure.py\n+++ b/lib/matplotlib/figure.py\n@@ -2426,9 +2426,12 @@ def __init__(self,\n             if isinstance(tight_layout, dict):\n                 self.get_layout_engine().set(**tight_layout)\n         elif constrained_layout is not None:\n-            self.set_layout_engine(layout='constrained')\n             if isinstance(constrained_layout, dict):\n+                self.set_layout_engine(layout='constrained')\n                 self.get_layout_engine().set(**constrained_layout)\n+            elif constrained_layout:\n+                self.set_layout_engine(layout='constrained')\n+\n         else:\n             # everything is None, so use default:\n             self.set_layout_engine(layout=layout)\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,44 @@\n+import matplotlib.pyplot as plt\n+import numpy as np\n+import warnings\n+\n+def test_constrained_layout_false_no_warning():\n+    \"\"\"\n+    Test that no warning is raised when using constrained_layout=False\n+    with plt.subplots_adjust.\n+\n+    This reproduces the bug where a UserWarning is incorrectly raised\n+    even when constrained_layout=False is explicitly set.\n+    \"\"\"\n+    # Create test data\n+    a = np.linspace(0, 2*np.pi, 100)\n+    b = np.sin(a)\n+    c = np.cos(a)\n+\n+    # Capture warnings\n+    with warnings.catch_warnings(record=True) as w:\n+        warnings.simplefilter(\"always\")\n+\n+        # Create figure with constrained_layout=False\n+        fig, ax = plt.subplots(1, 2, figsize=(8, 2), constrained_layout=False)\n+        ax[0].plot(a, b)\n+        ax[1].plot(a, c)\n+\n+        # This should NOT raise a warning when constrained_layout=False\n+        plt.subplots_adjust(wspace=0)\n+\n+        # Check if any warnings were raised\n+        if len(w) > 0:\n+            for warning in w:\n+                print(f\"Warning raised: {warning.category.__name__}: {warning.message}\")\n+                # Check if it's the specific warning we're looking for\n+                if \"incompatible with subplots_adjust\" in str(warning.message):\n+                    print(\"FAIL: The bug is present - warning raised despite constrained_layout=False\")\n+                    plt.close(fig)\n+                    assert False, f\"Unexpected warning: {warning.message}\"\n+\n+        print(\"PASS: No warning raised - bug is fixed\")\n+        plt.close(fig)\n+\n+if __name__ == \"__main__\":\n+    test_constrained_layout_false_no_warning()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

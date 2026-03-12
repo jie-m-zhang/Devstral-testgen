@@ -1,0 +1,14 @@
+{
+  "instance_id": "sympy__sympy-22005",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.b3f5cf77178b3e16dd7404:latest",
+  "test_commands": [],
+  "new_patch": "diff --git a/sympy/solvers/polysys.py b/sympy/solvers/polysys.py\n--- a/sympy/solvers/polysys.py\n+++ b/sympy/solvers/polysys.py\n@@ -240,6 +240,12 @@ def _solve_reduced_system(system, gens, entry=False):\n \n         univariate = list(filter(_is_univariate, basis))\n \n+        if len(basis) < len(gens):\n+            raise NotImplementedError(filldedent('''\n+                only zero-dimensional systems supported\n+                (finite number of solutions)\n+                '''))\n+\n         if len(univariate) == 1:\n             f = univariate.pop()\n         else:\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,39 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with infinite solution detection in solve_poly_system.\n+\n+This test should:\n+- FAIL on the base commit (buggy version) - exit code != 0\n+- PASS on the head commit (fixed version) - exit code = 0\n+\n+The issue is that solve_poly_system((y - 1,), x, y) incorrectly returns [(1,)]\n+instead of raising NotImplementedError for infinite solution systems.\n+\"\"\"\n+\n+from sympy import Poly, symbols\n+from sympy.solvers.polysys import solve_poly_system\n+from sympy.testing.pytest import raises\n+\n+def test_infinite_solution_detection():\n+    \"\"\"Test that infinite solution systems are properly detected and raise NotImplementedError.\"\"\"\n+\n+    x, y = symbols('x y')\n+\n+    # Test case 1: (x - 1) with generators (x, y)\n+    # This should raise NotImplementedError because we have 1 equation but 2 variables\n+    # which means infinite solutions\n+    print(\"Test 1: solve_poly_system([x-1,], (x, y))\")\n+    raises(NotImplementedError, lambda: solve_poly_system([x-1,], (x, y)))\n+    print(\"Test 1 PASSED\")\n+\n+    # Test case 2: (y - 1) with generators (x, y)\n+    # This should also raise NotImplementedError\n+    # This is the main bug - it incorrectly returns [(1,)] instead of raising NotImplementedError\n+    print(\"Test 2: solve_poly_system([y-1,], (x, y))\")\n+    raises(NotImplementedError, lambda: solve_poly_system([y-1,], (x, y)))\n+    print(\"Test 2 PASSED\")\n+\n+    print(\"\\nAll tests passed!\")\n+\n+if __name__ == \"__main__\":\n+    test_infinite_solution_detection()",
+  "success": false,
+  "validation_passed": false,
+  "repair_attempts": 4,
+  "exception": "FAILS_ON_HEAD",
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 1
+}

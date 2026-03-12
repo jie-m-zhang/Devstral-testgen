@@ -1,0 +1,16 @@
+{
+  "instance_id": "django__django-11179",
+  "base_image": "exec.eval.x86_64.ee2ad6945f237e9160354f.e82c5018e95ecf046149b3:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py\n--- a/django/db/models/deletion.py\n+++ b/django/db/models/deletion.py\n@@ -277,6 +277,7 @@ def delete(self):\n             if self.can_fast_delete(instance):\n                 with transaction.mark_for_rollback_on_error():\n                     count = sql.DeleteQuery(model).delete_batch([instance.pk], self.using)\n+                setattr(instance, model._meta.pk.attname, None)\n                 return count, {model._meta.label: count}\n \n         with transaction.atomic(using=self.using, savepoint=False):\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,71 @@\n+\"\"\"\n+Test to reproduce the issue where delete() on instances of models without any\n+dependencies doesn't clear PKs.\n+\n+The issue is that when a model instance with no dependencies is deleted via the\n+fast delete path, the primary key is not cleared on the instance.\n+\"\"\"\n+\n+import os\n+import sys\n+import django\n+from django.conf import settings\n+\n+# Configure Django settings\n+if not settings.configured:\n+    settings.configure(\n+        DEBUG=True,\n+        DATABASES={\n+            'default': {\n+                'ENGINE': 'django.db.backends.sqlite3',\n+                'NAME': ':memory:',\n+            }\n+        },\n+        INSTALLED_APPS=[\n+            'django.contrib.contenttypes',\n+            'django.contrib.auth',\n+        ],\n+        SECRET_KEY='test-secret-key',\n+    )\n+    django.setup()\n+\n+from django.db import models\n+from django.test import TestCase\n+\n+# Define a simple model with no dependencies\n+class SimpleModel(models.Model):\n+    name = models.CharField(max_length=100)\n+\n+    class Meta:\n+        app_label = 'test_app'\n+\n+# Create the table\n+from django.db import connection\n+with connection.schema_editor() as schema_editor:\n+    schema_editor.create_model(SimpleModel)\n+\n+def test_pk_cleared_after_delete():\n+    \"\"\"\n+    Test that the primary key is cleared after calling delete() on a model\n+    instance with no dependencies.\n+    \"\"\"\n+    # Create an instance\n+    instance = SimpleModel.objects.create(name=\"test\")\n+    original_pk = instance.pk\n+\n+    print(f\"Created instance with PK: {original_pk}\")\n+\n+    # Verify the instance has a PK\n+    assert instance.pk is not None, \"Instance should have a PK after creation\"\n+\n+    # Delete the instance\n+    instance.delete()\n+\n+    # The PK should be cleared (set to None) after deletion\n+    # This is the assertion that will fail on the buggy version\n+    assert instance.pk is None, f\"PK should be None after delete(), but got: {instance.pk}\"\n+\n+    print(\"Test passed - PK was properly cleared after delete()\")\n+\n+if __name__ == \"__main__\":\n+    test_pk_cleared_after_delete()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-21627",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.3c55f01dd2b8495a8bda79:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/functions/elementary/complexes.py b/sympy/functions/elementary/complexes.py\n--- a/sympy/functions/elementary/complexes.py\n+++ b/sympy/functions/elementary/complexes.py\n@@ -607,6 +607,8 @@ def eval(cls, arg):\n             arg2 = -S.ImaginaryUnit * arg\n             if arg2.is_extended_nonnegative:\n                 return arg2\n+        if arg.is_extended_real:\n+            return\n         # reject result if all new conjugates are just wrappers around\n         # an expression that was already in the arg\n         conj = signsimp(arg.conjugate(), evaluate=False)\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,36 @@\n+\"\"\"\n+Test to reproduce the RecursionError when checking is_zero of cosh expression.\n+\n+Issue: Bug: maximum recursion depth error when checking is_zero of cosh expression\n+The expression cosh(acos(-i + acosh(-g + i))) causes a RecursionError when\n+checking if it is zero.\n+\n+This test should:\n+- FAIL on base commit (126f805781) with RecursionError\n+- PASS on head commit (f9a6f50ec0) without error\n+\"\"\"\n+\n+from sympy import sympify, symbols\n+\n+def test_cosh_is_zero_recursion_error():\n+    \"\"\"Test that checking is_zero on cosh expression doesn't cause RecursionError.\"\"\"\n+    # Create the problematic expression\n+    expr = sympify(\"cosh(acos(-i + acosh(-g + i)))\")\n+\n+    # This should not raise a RecursionError\n+    # On base commit: will raise RecursionError\n+    # On head commit: will return None or False (can't determine if zero)\n+    try:\n+        result = expr.is_zero\n+        # If we get here, the bug is fixed\n+        # The result can be None (unknown) or False (not zero)\n+        # Both are acceptable - the important thing is no RecursionError\n+        print(f\"Test passed - no RecursionError, is_zero = {result}\")\n+        return True\n+    except RecursionError as e:\n+        # This is the bug - should not happen on fixed version\n+        print(f\"Test failed - RecursionError occurred: {e}\")\n+        raise AssertionError(\"RecursionError occurred when checking is_zero\") from e\n+\n+if __name__ == \"__main__\":\n+    test_cosh_is_zero_recursion_error()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

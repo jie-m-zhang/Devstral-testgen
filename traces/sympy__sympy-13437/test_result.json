@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-13437",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.82520889382a87b072cd17:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/functions/combinatorial/numbers.py b/sympy/functions/combinatorial/numbers.py\n--- a/sympy/functions/combinatorial/numbers.py\n+++ b/sympy/functions/combinatorial/numbers.py\n@@ -424,6 +424,15 @@ def _bell_incomplete_poly(n, k, symbols):\n \n     @classmethod\n     def eval(cls, n, k_sym=None, symbols=None):\n+        if n is S.Infinity:\n+            if k_sym is None:\n+                return S.Infinity\n+            else:\n+                raise ValueError(\"Bell polynomial is not defined\")\n+\n+        if n.is_negative or n.is_integer is False:\n+            raise ValueError(\"a non-negative integer expected\")\n+\n         if n.is_Integer and n.is_nonnegative:\n             if k_sym is None:\n                 return Integer(cls._bell(int(n)))\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,28 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with bell(n).limit(n, oo)\n+\n+The issue states that bell(n).limit(n, oo) should return oo (infinity)\n+but currently returns bell(oo).\n+\"\"\"\n+\n+from sympy import symbols, bell, oo, limit\n+\n+def test_bell_limit_infinity():\n+    \"\"\"Test that bell(n).limit(n, oo) returns oo instead of bell(oo)\"\"\"\n+    n = symbols('n')\n+\n+    # This should return oo (infinity)\n+    result = limit(bell(n), n, oo)\n+\n+    # The expected result is oo\n+    expected = oo\n+\n+    # This assertion will fail on the buggy version (returns bell(oo))\n+    # and pass on the fixed version (returns oo)\n+    assert result == expected, f\"Expected {expected}, got {result}\"\n+\n+    print(\"Test passed - bell(n).limit(n, oo) correctly returns oo\")\n+\n+if __name__ == \"__main__\":\n+    test_bell_limit_infinity()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

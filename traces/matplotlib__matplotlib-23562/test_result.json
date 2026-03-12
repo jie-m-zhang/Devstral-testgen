@@ -1,0 +1,16 @@
+{
+  "instance_id": "matplotlib__matplotlib-23562",
+  "base_image": "exec.eval.x86_64.b3179f57cacc7fd132d529.98b0ace3c05a2eac9a6296:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/lib/mpl_toolkits/mplot3d/art3d.py b/lib/mpl_toolkits/mplot3d/art3d.py\n--- a/lib/mpl_toolkits/mplot3d/art3d.py\n+++ b/lib/mpl_toolkits/mplot3d/art3d.py\n@@ -867,9 +867,19 @@ def set_alpha(self, alpha):\n         self.stale = True\n \n     def get_facecolor(self):\n+        # docstring inherited\n+        # self._facecolors2d is not initialized until do_3d_projection\n+        if not hasattr(self, '_facecolors2d'):\n+            self.axes.M = self.axes.get_proj()\n+            self.do_3d_projection()\n         return self._facecolors2d\n \n     def get_edgecolor(self):\n+        # docstring inherited\n+        # self._edgecolors2d is not initialized until do_3d_projection\n+        if not hasattr(self, '_edgecolors2d'):\n+            self.axes.M = self.axes.get_proj()\n+            self.do_3d_projection()\n         return self._edgecolors2d\n \n \n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,38 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue where 'Poly3DCollection' object has no attribute '_facecolors2d'\n+when calling get_facecolors() on a plot_surface result.\n+\n+This test should:\n+- FAIL on base commit (29a86636a9c45ab5ac4d80ac76eaee497f460dce) with AttributeError\n+- PASS on head commit (de98877e3dc45de8dd441d008f23d88738dc015d) without error\n+\"\"\"\n+\n+import numpy as np\n+import matplotlib.tri as mtri\n+import matplotlib.pyplot as plt\n+from mpl_toolkits.mplot3d import Axes3D\n+\n+def test_issue_reproduction():\n+    \"\"\"Test that get_facecolors() works on Poly3DCollection from plot_surface.\"\"\"\n+    # Create test data\n+    y, x = np.ogrid[1:10:100j, 1:10:100j]\n+    z2 = np.cos(x)**3 - np.sin(y)**2\n+\n+    # Create figure and plot surface\n+    fig = plt.figure()\n+    ax = fig.add_subplot(111, projection='3d')\n+    r = ax.plot_surface(x, y, z2, cmap='hot')\n+\n+    # This should fail on base commit with AttributeError\n+    # and pass on head commit after the fix\n+    facecolors = r.get_facecolors()\n+\n+    # Basic assertion to verify we got a result\n+    assert facecolors is not None, \"get_facecolors() returned None\"\n+    assert hasattr(facecolors, '__len__'), \"get_facecolors() did not return an array-like object\"\n+\n+    print(\"Test passed - issue is fixed\")\n+\n+if __name__ == \"__main__\":\n+    test_issue_reproduction()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

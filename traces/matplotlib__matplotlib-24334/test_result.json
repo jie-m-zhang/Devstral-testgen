@@ -1,0 +1,16 @@
+{
+  "instance_id": "matplotlib__matplotlib-24334",
+  "base_image": "exec.eval.x86_64.2d6052d0094739c9380d87.0d636dcd37658fa9450408:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/lib/matplotlib/axis.py b/lib/matplotlib/axis.py\n--- a/lib/matplotlib/axis.py\n+++ b/lib/matplotlib/axis.py\n@@ -2029,6 +2029,9 @@ def set_ticks(self, ticks, labels=None, *, minor=False, **kwargs):\n         other limits, you should set the limits explicitly after setting the\n         ticks.\n         \"\"\"\n+        if labels is None and kwargs:\n+            raise ValueError('labels argument cannot be None when '\n+                             'kwargs are passed')\n         result = self._set_tick_locations(ticks, minor=minor)\n         if labels is not None:\n             self.set_ticklabels(labels, minor=minor, **kwargs)\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,48 @@\n+\"\"\"\n+Test to reproduce the issue where Axis.set_ticks only validates kwargs if ticklabels are set.\n+\n+The issue is that when calling set_xticks with kwargs but without labels,\n+the kwargs are silently ignored instead of raising an error.\n+\n+This test should:\n+- FAIL on the base commit (buggy version) - no error is raised\n+- PASS on the head commit (fixed version) - ValueError is raised\n+\"\"\"\n+\n+import matplotlib.pyplot as plt\n+import matplotlib.axes as maxes\n+\n+def test_set_ticks_with_kwargs_no_labels():\n+    \"\"\"\n+    Test that set_ticks raises ValueError when kwargs are passed without labels.\n+\n+    This reproduces the issue described in the GitHub issue where kwargs\n+    are silently ignored when labels is None.\n+    \"\"\"\n+    # Create a simple figure and axis\n+    fig, ax = plt.subplots()\n+\n+    # Try to call set_xticks with kwargs but without labels\n+    # According to the docstring, kwargs should only take effect if labels are passed\n+    # So this should raise an error\n+    try:\n+        ax.set_xticks([0, 1], fontsize=12)  # fontsize is a Text property\n+        # If we get here, no error was raised (buggy behavior)\n+        print(\"ERROR: No exception was raised - this is the buggy behavior\")\n+        return False\n+    except ValueError as e:\n+        # This is the expected behavior after the fix\n+        print(f\"SUCCESS: ValueError was raised as expected: {e}\")\n+        return True\n+    except Exception as e:\n+        print(f\"ERROR: Unexpected exception: {type(e).__name__}: {e}\")\n+        return False\n+\n+if __name__ == \"__main__\":\n+    result = test_set_ticks_with_kwargs_no_labels()\n+    if result:\n+        print(\"\\nTest PASSED - issue is fixed\")\n+        exit(0)\n+    else:\n+        print(\"\\nTest FAILED - issue still exists\")\n+        exit(1)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

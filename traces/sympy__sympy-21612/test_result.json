@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-21612",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.7049653f55d2036f56aa86:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/printing/str.py b/sympy/printing/str.py\n--- a/sympy/printing/str.py\n+++ b/sympy/printing/str.py\n@@ -333,7 +333,7 @@ def apow(i):\n                     b.append(apow(item))\n                 else:\n                     if (len(item.args[0].args) != 1 and\n-                            isinstance(item.base, Mul)):\n+                            isinstance(item.base, (Mul, Pow))):\n                         # To avoid situations like #14160\n                         pow_paren.append(item)\n                     b.append(item.base)\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,43 @@\n+#!/usr/bin/env python3\n+\"\"\"\n+Test to reproduce the issue with printing of Pow expressions in denominators.\n+\n+The issue is that when we have a Pow with exponent -1 whose base is itself a Pow,\n+the string representation should add parentheses around the base to avoid ambiguity.\n+\n+For example: x / (y**(-1)) should be printed as x/(y**(-1)) or x/(1/y), not x/1/y\n+\n+The patch fixes this by adding Pow to the condition that checks when to add\n+parentheses around terms in the denominator.\n+\"\"\"\n+\n+from sympy import symbols, Pow, Mul\n+\n+def test_issue_reproduction():\n+    x, y = symbols('x y')\n+\n+    # Create an expression: x / (y**(-1))\n+    # This is: x * (y**(-1))**(-1) = x * y\n+    # But we want to test the printing of the unevaluated form\n+\n+    # Create the expression without simplification\n+    # The denominator is Pow(y, -1), and we're raising it to -1\n+    # So we have: x * Pow(Pow(y, -1, evaluate=False), -1, evaluate=False)\n+    # This should print as x/(1/y) with parentheses, not x/1/y\n+\n+    expr = Mul(x, Pow(Pow(y, -1, evaluate=False), -1, evaluate=False), evaluate=False)\n+\n+    result = str(expr)\n+    expected = \"x/(1/y)\"  # SymPy simplifies y**(-1) to 1/y\n+\n+    print(f\"Expression: {expr}\")\n+    print(f\"Result: {result}\")\n+    print(f\"Expected: {expected}\")\n+\n+    # This assertion will fail on buggy code (gives x/1/y), pass on fixed code (gives x/(1/y))\n+    assert result == expected, f\"Expected '{expected}', got '{result}'\"\n+\n+    print(\"Test passed - issue is fixed\")\n+\n+if __name__ == \"__main__\":\n+    test_issue_reproduction()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

@@ -1,0 +1,16 @@
+{
+  "instance_id": "django__django-15061",
+  "base_image": "exec.eval.x86_64.6b24dca158642bd6288384.3aa94e200c3b2eca2a3f14:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/django/forms/widgets.py b/django/forms/widgets.py\n--- a/django/forms/widgets.py\n+++ b/django/forms/widgets.py\n@@ -849,9 +849,7 @@ def get_context(self, name, value, attrs):\n         return context\n \n     def id_for_label(self, id_):\n-        if id_:\n-            id_ += '_0'\n-        return id_\n+        return ''\n \n     def value_from_datadict(self, data, files, name):\n         return [\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,57 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with MultiWidget's id_for_label method.\n+\n+The issue is that MultiWidget.id_for_label() adds '_0' to the id, which doesn't make sense.\n+The fix is to return an empty string instead.\n+\"\"\"\n+\n+import os\n+import sys\n+import django\n+\n+# Setup Django\n+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test_settings')\n+sys.path.insert(0, '/testbed')\n+\n+# Minimal Django settings for testing\n+from django.conf import settings\n+\n+if not settings.configured:\n+    settings.configure(\n+        DEBUG=True,\n+        SECRET_KEY='test-secret-key',\n+        INSTALLED_APPS=[\n+            'django.contrib.contenttypes',\n+            'django.contrib.auth',\n+        ],\n+        USE_TZ=True,\n+    )\n+\n+django.setup()\n+\n+from django.forms.widgets import MultiWidget, TextInput\n+\n+def test_multiwidget_id_for_label():\n+    \"\"\"\n+    Test that MultiWidget.id_for_label() returns an empty string.\n+\n+    On the buggy version, it will return 'test_id_0' (fails the assertion).\n+    On the fixed version, it will return '' (passes the assertion).\n+    \"\"\"\n+    # Create a simple MultiWidget with TextInput widgets\n+    widget = MultiWidget([TextInput, TextInput])\n+\n+    # Test the id_for_label method\n+    test_id = 'test_id'\n+    result = widget.id_for_label(test_id)\n+\n+    # The expected behavior is to return an empty string\n+    # This will fail on the buggy version (returns 'test_id_0')\n+    # This will pass on the fixed version (returns '')\n+    assert result == '', f\"Expected empty string, got '{result}'\"\n+\n+    print(f\"Test passed! id_for_label('{test_id}') returned '{result}'\")\n+\n+if __name__ == '__main__':\n+    test_multiwidget_id_for_label()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

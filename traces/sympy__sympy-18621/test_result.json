@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-18621",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.493e5a17b258b79836e6c1:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py\n--- a/sympy/matrices/expressions/blockmatrix.py\n+++ b/sympy/matrices/expressions/blockmatrix.py\n@@ -301,7 +301,7 @@ def blocks(self):\n         data = [[mats[i] if i == j else ZeroMatrix(mats[i].rows, mats[j].cols)\n                         for j in range(len(mats))]\n                         for i in range(len(mats))]\n-        return ImmutableDenseMatrix(data)\n+        return ImmutableDenseMatrix(data, evaluate=False)\n \n     @property\n     def shape(self):\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,51 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue where BlockDiagMatrix with one element\n+cannot be converted to regular Matrix.\n+\n+This test should:\n+- FAIL on base commit (b17ef6effe278d5b861d65896cc53442a6370d8f)\n+- PASS on head commit (28b41c73c12b70d6ad9f6e45109a80649c4456da)\n+\"\"\"\n+\n+import sympy\n+\n+def test_blockdiag_single_matrix_conversion():\n+    \"\"\"\n+    Test that a BlockDiagMatrix with one element can be converted to a regular Matrix.\n+\n+    This reproduces the issue where:\n+    M = sympy.Matrix([[1, 2], [3, 4]])\n+    D = sympy.BlockDiagMatrix(M)\n+    B = sympy.Matrix(D)  # This should fail on base commit\n+    \"\"\"\n+    # Create a regular Matrix\n+    M = sympy.Matrix([[1, 2], [3, 4]])\n+\n+    # Create a BlockDiagMatrix with one element\n+    D = sympy.BlockDiagMatrix(M)\n+\n+    # Try to convert back to regular Matrix - this should fail on base commit\n+    try:\n+        B = sympy.Matrix(D)\n+        # If we get here, the conversion succeeded\n+        print(\"Conversion succeeded!\")\n+        print(\"Result matrix:\")\n+        print(B)\n+\n+        # Verify the result is correct\n+        expected = sympy.Matrix([[1, 2], [3, 4]])\n+        assert B == expected, f\"Expected {expected}, got {B}\"\n+\n+        # Test passed\n+        print(\"Test PASSED - issue is fixed\")\n+        return True\n+\n+    except TypeError as e:\n+        print(f\"Test FAILED - issue reproduced: {e}\")\n+        return False\n+\n+if __name__ == \"__main__\":\n+    success = test_blockdiag_single_matrix_conversion()\n+    if not success:\n+        exit(1)  # Exit with non-zero code to indicate failure",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

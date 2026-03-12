@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-20212",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.56a1c982bdce1ce35f46ba:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/core/power.py b/sympy/core/power.py\n--- a/sympy/core/power.py\n+++ b/sympy/core/power.py\n@@ -291,6 +291,8 @@ def __new__(cls, b, e, evaluate=None):\n             ).warn()\n \n         if evaluate:\n+            if b is S.Zero and e is S.NegativeInfinity:\n+                return S.ComplexInfinity\n             if e is S.ComplexInfinity:\n                 return S.NaN\n             if e is S.Zero:\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,32 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue where 0**-oo produces 0 instead of zoo (ComplexInfinity).\n+\n+This test should:\n+- FAIL on base commit (a106f4782a9dbe7f8fd16030f15401d977e03ae9) - exit code != 0\n+- PASS on head commit (cffd4e0f86fefd4802349a9f9b19ed70934ea354) - exit code = 0\n+\"\"\"\n+\n+from sympy import S, oo\n+\n+def test_issue_reproduction():\n+    \"\"\"\n+    Test that 0**-oo returns zoo (ComplexInfinity) as documented.\n+\n+    According to the documentation for the Pow class:\n+    | expr | value | reason |\n+    | :-- | :-- | :--|\n+    | `0**-oo` | `zoo` | This is not strictly true, as 0**oo may be oscillating between positive and negative values or rotating in the complex plane. It is convenient, however, when the base is positive.|\n+    \"\"\"\n+    # Code to reproduce the issue\n+    result = S.Zero**-oo\n+\n+    # This assertion will fail on buggy code (base commit), pass on fixed code (head commit)\n+    # On base commit: result = 0\n+    # On head commit: result = zoo (ComplexInfinity)\n+    assert result == S.ComplexInfinity, f\"Expected 'zoo' (ComplexInfinity), got '{result}'\"\n+\n+    print(\"Test passed - issue is fixed\")\n+\n+if __name__ == \"__main__\":\n+    test_issue_reproduction()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

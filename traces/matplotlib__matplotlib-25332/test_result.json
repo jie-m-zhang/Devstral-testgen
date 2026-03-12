@@ -1,0 +1,16 @@
+{
+  "instance_id": "matplotlib__matplotlib-25332",
+  "base_image": "exec.eval.x86_64.eb4bd652c8ffac6a577d03.c8bfd9fb5e1821594b276a:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/lib/matplotlib/cbook.py b/lib/matplotlib/cbook.py\n--- a/lib/matplotlib/cbook.py\n+++ b/lib/matplotlib/cbook.py\n@@ -788,6 +788,19 @@ class Grouper:\n     def __init__(self, init=()):\n         self._mapping = {weakref.ref(x): [weakref.ref(x)] for x in init}\n \n+    def __getstate__(self):\n+        return {\n+            **vars(self),\n+            # Convert weak refs to strong ones.\n+            \"_mapping\": {k(): [v() for v in vs] for k, vs in self._mapping.items()},\n+        }\n+\n+    def __setstate__(self, state):\n+        vars(self).update(state)\n+        # Convert strong refs to weak ones.\n+        self._mapping = {weakref.ref(k): [*map(weakref.ref, vs)]\n+                         for k, vs in self._mapping.items()}\n+\n     def __contains__(self, item):\n         return weakref.ref(item) in self._mapping\n \n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,47 @@\n+import matplotlib.pyplot as plt\n+import pickle\n+\n+def test_align_labels_pickle():\n+    \"\"\"\n+    Test that a figure can be pickled after calling align_labels().\n+\n+    This test reproduces the issue where calling align_labels() on a figure\n+    makes it unpicklable due to weakref.ReferenceType objects.\n+    \"\"\"\n+    fig = plt.figure()\n+    ax1 = fig.add_subplot(211)\n+    ax2 = fig.add_subplot(212)\n+    time = [0, 1, 2, 3, 4]\n+    speed = [40000, 4300, 4500, 4700, 4800]\n+    acc = [10, 11, 12, 13, 14]\n+    ax1.plot(time, speed)\n+    ax1.set_ylabel('speed')\n+    ax2.plot(time, acc)\n+    ax2.set_ylabel('acc')\n+\n+    # This is the critical line that causes the issue\n+    fig.align_labels()\n+\n+    # Try to pickle the figure - this should fail on base commit\n+    try:\n+        pickled_data = pickle.dumps(fig)\n+        # If we get here, pickling succeeded\n+        print(\"SUCCESS: Figure was pickled successfully\")\n+        # Try to unpickle to make sure it works completely\n+        unpickled_fig = pickle.loads(pickled_data)\n+        print(\"SUCCESS: Figure was unpickled successfully\")\n+        plt.close(unpickled_fig)\n+        plt.close(fig)\n+        return True\n+    except TypeError as e:\n+        print(f\"FAILED: {e}\")\n+        plt.close(fig)\n+        return False\n+\n+if __name__ == \"__main__\":\n+    success = test_align_labels_pickle()\n+    if success:\n+        print(\"Test passed - issue is fixed\")\n+    else:\n+        print(\"Test failed - issue reproduced\")\n+        exit(1)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-21379",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.f7b11b7b20faee421d106a:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/core/mod.py b/sympy/core/mod.py\n--- a/sympy/core/mod.py\n+++ b/sympy/core/mod.py\n@@ -40,6 +40,7 @@ def eval(cls, p, q):\n         from sympy.core.mul import Mul\n         from sympy.core.singleton import S\n         from sympy.core.exprtools import gcd_terms\n+        from sympy.polys.polyerrors import PolynomialError\n         from sympy.polys.polytools import gcd\n \n         def doit(p, q):\n@@ -166,10 +167,13 @@ def doit(p, q):\n         # XXX other possibilities?\n \n         # extract gcd; any further simplification should be done by the user\n-        G = gcd(p, q)\n-        if G != 1:\n-            p, q = [\n-                gcd_terms(i/G, clear=False, fraction=False) for i in (p, q)]\n+        try:\n+            G = gcd(p, q)\n+            if G != 1:\n+                p, q = [gcd_terms(i/G, clear=False, fraction=False)\n+                        for i in (p, q)]\n+        except PolynomialError:  # issue 21373\n+            G = S.One\n         pwas, qwas = p, q\n \n         # simplify terms\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,37 @@\n+from sympy import *\n+from sympy.core.cache import clear_cache\n+\n+def test_issue_reproduction():\n+    \"\"\"\n+    Test for unexpected PolynomialError when using subs() for particular expressions.\n+    This test reproduces the issue described in the GitHub issue.\n+    \"\"\"\n+    # Clear cache to ensure consistent behavior\n+    clear_cache()\n+\n+    # Create symbols with real=True (this is critical for the bug)\n+    x, y, z = symbols('x y z', real=True)\n+\n+    # Create the problematic expression\n+    expr = exp(sinh(Piecewise((x, y > x), (y, True)) / z))\n+\n+    # This should not raise PolynomialError\n+    # The bug occurs on the first call to subs after cache is cleared\n+    try:\n+        result = expr.subs({1: 1.0})\n+        # If we get here, the test passes (no exception)\n+        print(\"Test passed - no PolynomialError raised\")\n+        return True\n+    except PolynomialError as e:\n+        # If we get here, the bug is present\n+        print(f\"Test failed - PolynomialError raised: {e}\")\n+        return False\n+\n+if __name__ == \"__main__\":\n+    success = test_issue_reproduction()\n+    if not success:\n+        # Exit with non-zero code to indicate failure\n+        exit(1)\n+    else:\n+        # Exit with zero code to indicate success\n+        exit(0)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

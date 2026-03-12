@@ -1,0 +1,16 @@
+{
+  "instance_id": "matplotlib__matplotlib-24149",
+  "base_image": "exec.eval.x86_64.2d6052d0094739c9380d87.281d927ed0b873c68b5a65:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/lib/matplotlib/axes/_axes.py b/lib/matplotlib/axes/_axes.py\n--- a/lib/matplotlib/axes/_axes.py\n+++ b/lib/matplotlib/axes/_axes.py\n@@ -2182,11 +2182,19 @@ def _convert_dx(dx, x0, xconv, convert):\n                 x0 = cbook._safe_first_finite(x0)\n             except (TypeError, IndexError, KeyError):\n                 pass\n+            except StopIteration:\n+                # this means we found no finite element, fall back to first\n+                # element unconditionally\n+                x0 = cbook.safe_first_element(x0)\n \n             try:\n                 x = cbook._safe_first_finite(xconv)\n             except (TypeError, IndexError, KeyError):\n                 x = xconv\n+            except StopIteration:\n+                # this means we found no finite element, fall back to first\n+                # element unconditionally\n+                x = cbook.safe_first_element(xconv)\n \n             delist = False\n             if not np.iterable(dx):\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,33 @@\n+import numpy as np\n+import matplotlib.pyplot as plt\n+\n+def test_issue_reproduction():\n+    \"\"\"\n+    Test that ax.bar handles all-NaN data without raising StopIteration.\n+\n+    This test reproduces the issue where ax.bar raises StopIteration\n+    when passed only nan data in matplotlib 3.6.1.\n+    \"\"\"\n+    # Create figure and axes\n+    f, ax = plt.subplots()\n+\n+    # This should not raise StopIteration\n+    try:\n+        result = ax.bar([np.nan], [np.nan])\n+        print(\"Test passed - ax.bar handled all-NaN data successfully\")\n+        print(f\"Result type: {type(result)}\")\n+        print(f\"Number of bars: {len(result)}\")\n+        return True\n+    except StopIteration as e:\n+        print(f\"Test failed - StopIteration raised: {e}\")\n+        return False\n+    except Exception as e:\n+        print(f\"Test failed - Unexpected exception: {type(e).__name__}: {e}\")\n+        return False\n+\n+if __name__ == \"__main__\":\n+    success = test_issue_reproduction()\n+    if not success:\n+        exit(1)\n+    else:\n+        exit(0)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

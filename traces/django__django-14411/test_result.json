@@ -1,0 +1,16 @@
+{
+  "instance_id": "django__django-14411",
+  "base_image": "exec.eval.x86_64.ebed327f02c059ebd6024a.dc6eb5b1b6e02229dab964:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/django/contrib/auth/forms.py b/django/contrib/auth/forms.py\n--- a/django/contrib/auth/forms.py\n+++ b/django/contrib/auth/forms.py\n@@ -50,6 +50,9 @@ def get_context(self, name, value, attrs):\n         context['summary'] = summary\n         return context\n \n+    def id_for_label(self, id_):\n+        return None\n+\n \n class ReadOnlyPasswordHashField(forms.Field):\n     widget = ReadOnlyPasswordHashWidget\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,74 @@\n+\"\"\"\n+Test to reproduce the issue where ReadOnlyPasswordHashWidget's label\n+points to a non-labelable element.\n+\"\"\"\n+\n+import os\n+import sys\n+import django\n+from django import forms\n+\n+# Setup Django\n+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test_settings')\n+sys.path.insert(0, '/testbed')\n+\n+# Create minimal settings\n+from django.conf import settings\n+\n+if not settings.configured:\n+    settings.configure(\n+        DEBUG=True,\n+        SECRET_KEY='test-secret-key',\n+        INSTALLED_APPS=[\n+            'django.contrib.auth',\n+            'django.contrib.contenttypes',\n+        ],\n+        TEMPLATES=[{\n+            'BACKEND': 'django.template.backends.django.DjangoTemplates',\n+            'DIRS': [],\n+            'APP_DIRS': True,\n+        }],\n+        USE_TZ=True,\n+    )\n+\n+django.setup()\n+\n+from django.contrib.auth.forms import ReadOnlyPasswordHashWidget, ReadOnlyPasswordHashField\n+from django.contrib.auth.hashers import make_password\n+\n+def test_readonly_password_hash_widget_label():\n+    \"\"\"\n+    Test that ReadOnlyPasswordHashWidget doesn't have a 'for' attribute in its label.\n+\n+    The widget renders text (not an input), so the label should not have a 'for' attribute.\n+    \"\"\"\n+    # Create a form with ReadOnlyPasswordHashField\n+    class TestForm(forms.Form):\n+        password = ReadOnlyPasswordHashField(\n+            label=\"Password\",\n+            initial=make_password(\"testpassword\")\n+        )\n+\n+    # Instantiate the form\n+    form = TestForm()\n+\n+    # Get the bound field\n+    bound_field = form['password']\n+\n+    # Render the label\n+    label_html = bound_field.label_tag()\n+\n+    print(\"Label HTML:\", label_html)\n+\n+    # Check if the label has a 'for' attribute\n+    has_for_attr = 'for=\"' in label_html\n+\n+    # On the base commit (buggy version), the label will have a 'for' attribute\n+    # On the head commit (fixed version), the label should NOT have a 'for' attribute\n+    # So we assert that it should NOT have a 'for' attribute\n+    assert not has_for_attr, f\"Label should not have 'for' attribute, but got: {label_html}\"\n+\n+    print(\"Test passed - label does not have 'for' attribute\")\n+\n+if __name__ == \"__main__\":\n+    test_readonly_password_hash_widget_label()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

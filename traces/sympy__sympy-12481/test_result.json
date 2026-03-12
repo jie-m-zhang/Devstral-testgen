@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-12481",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.0301925bfdbf4bbe29d24f:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/combinatorics/permutations.py b/sympy/combinatorics/permutations.py\n--- a/sympy/combinatorics/permutations.py\n+++ b/sympy/combinatorics/permutations.py\n@@ -895,12 +895,8 @@ def __new__(cls, *args, **kwargs):\n         # counting starts from 1.\n \n         temp = flatten(args)\n-        if has_dups(temp):\n-            if is_cycle:\n-                raise ValueError('there were repeated elements; to resolve '\n-                'cycles use Cycle%s.' % ''.join([str(tuple(c)) for c in args]))\n-            else:\n-                raise ValueError('there were repeated elements.')\n+        if has_dups(temp) and not is_cycle:\n+            raise ValueError('there were repeated elements.')\n         temp = set(temp)\n \n         if not is_cycle and \\\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,41 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with non-disjoint cycles in Permutation constructor.\n+\n+The issue states that calling Permutation([[0,1],[0,1]]) raises a ValueError\n+instead of constructing the identity permutation. When cycles are non-disjoint,\n+they should be applied in left-to-right order and the resulting permutation\n+should be returned.\n+\"\"\"\n+\n+from sympy.combinatorics.permutations import Permutation\n+\n+def test_non_disjoint_cycles():\n+    \"\"\"\n+    Test that non-disjoint cycles are applied in left-to-right order.\n+\n+    The permutation [[0,1],[0,1]] should be equivalent to applying\n+    cycle (0,1) twice, which results in the identity permutation.\n+    \"\"\"\n+    # This should not raise ValueError but should create the identity permutation\n+    try:\n+        p = Permutation([[0, 1], [0, 1]])\n+        print(f\"Permutation created successfully: {p}\")\n+        print(f\"Array form: {p.array_form}\")\n+        print(f\"Is identity: {p.is_Identity}\")\n+\n+        # The result should be the identity permutation of size 2\n+        expected_array = [0, 1]\n+        assert p.array_form == expected_array, f\"Expected {expected_array}, got {p.array_form}\"\n+        assert p.is_Identity, \"Expected identity permutation\"\n+\n+        print(\"Test passed - non-disjoint cycles handled correctly\")\n+        return True\n+    except ValueError as e:\n+        print(f\"ValueError raised: {e}\")\n+        print(\"Test failed - non-disjoint cycles should be allowed\")\n+        return False\n+\n+if __name__ == \"__main__\":\n+    success = test_non_disjoint_cycles()\n+    exit(0 if success else 1)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

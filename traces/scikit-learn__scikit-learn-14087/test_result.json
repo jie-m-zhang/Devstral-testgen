@@ -1,0 +1,16 @@
+{
+  "instance_id": "scikit-learn__scikit-learn-14087",
+  "base_image": "exec.eval.x86_64.437918b9cd24690e5e9c56.3f631b80b3b1e3612fd63e:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sklearn/linear_model/logistic.py b/sklearn/linear_model/logistic.py\n--- a/sklearn/linear_model/logistic.py\n+++ b/sklearn/linear_model/logistic.py\n@@ -2170,7 +2170,7 @@ def fit(self, X, y, sample_weight=None):\n                 # Take the best scores across every fold and the average of\n                 # all coefficients corresponding to the best scores.\n                 best_indices = np.argmax(scores, axis=1)\n-                if self.multi_class == 'ovr':\n+                if multi_class == 'ovr':\n                     w = np.mean([coefs_paths[i, best_indices[i], :]\n                                  for i in range(len(folds))], axis=0)\n                 else:\n@@ -2180,8 +2180,11 @@ def fit(self, X, y, sample_weight=None):\n                 best_indices_C = best_indices % len(self.Cs_)\n                 self.C_.append(np.mean(self.Cs_[best_indices_C]))\n \n-                best_indices_l1 = best_indices // len(self.Cs_)\n-                self.l1_ratio_.append(np.mean(l1_ratios_[best_indices_l1]))\n+                if self.penalty == 'elasticnet':\n+                    best_indices_l1 = best_indices // len(self.Cs_)\n+                    self.l1_ratio_.append(np.mean(l1_ratios_[best_indices_l1]))\n+                else:\n+                    self.l1_ratio_.append(None)\n \n             if multi_class == 'multinomial':\n                 self.C_ = np.tile(self.C_, n_classes)\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,36 @@\n+import numpy as np\n+from sklearn.linear_model import LogisticRegressionCV\n+\n+def test_logistic_regression_cv_refit_false():\n+    \"\"\"\n+    Test that LogisticRegressionCV with refit=False doesn't throw IndexError.\n+\n+    This test reproduces the issue where an IndexError is thrown when trying to\n+    estimate a regularization parameter via cross-validation without refitting.\n+    \"\"\"\n+    np.random.seed(29)\n+    X = np.random.normal(size=(1000, 3))\n+    beta = np.random.normal(size=3)\n+    intercept = np.random.normal(size=None)\n+    y = np.sign(intercept + X @ beta)\n+\n+    # This should not raise an IndexError\n+    try:\n+        model = LogisticRegressionCV(\n+            cv=5,\n+            solver='saga',\n+            tol=1e-2,\n+            refit=False\n+        ).fit(X, y)\n+        print(\"Test passed - no IndexError thrown\")\n+        return True\n+    except IndexError as e:\n+        print(f\"IndexError thrown: {e}\")\n+        return False\n+\n+if __name__ == \"__main__\":\n+    success = test_logistic_regression_cv_refit_false()\n+    if not success:\n+        exit(1)\n+    else:\n+        exit(0)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

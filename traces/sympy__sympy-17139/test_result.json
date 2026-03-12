@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-17139",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.e60ccbb60941acd9871074:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/simplify/fu.py b/sympy/simplify/fu.py\n--- a/sympy/simplify/fu.py\n+++ b/sympy/simplify/fu.py\n@@ -500,6 +500,8 @@ def _f(rv):\n         # change is not going to allow a simplification as far as I can tell.\n         if not (rv.is_Pow and rv.base.func == f):\n             return rv\n+        if not rv.exp.is_real:\n+            return rv\n \n         if (rv.exp < 0) == True:\n             return rv\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,37 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with simplify(cos(x)**I) raising TypeError.\n+\n+The issue is that simplify(cos(x)**I) raises:\n+TypeError: Invalid comparison of complex I\n+\n+This happens because in fu.py, the code tries to compare rv.exp < 0\n+when rv.exp is the imaginary unit I, which is complex and cannot be\n+compared with real numbers.\n+\n+The fix adds a check for rv.exp.is_real before doing the comparison.\n+\"\"\"\n+\n+from sympy import Symbol, cos, I, simplify\n+\n+def test_issue_reproduction():\n+    \"\"\"Test that simplify(cos(x)**I) works without raising TypeError.\"\"\"\n+    x = Symbol('x')\n+    \n+    # This should not raise TypeError\n+    try:\n+        result = simplify(cos(x)**I)\n+        # If we get here, the issue is fixed\n+        print(f\"Test passed - simplify(cos(x)**I) returned: {result}\")\n+        return True\n+    except TypeError as e:\n+        # This is the bug - should not happen in fixed version\n+        print(f\"Test failed - TypeError raised: {e}\")\n+        return False\n+\n+if __name__ == \"__main__\":\n+    success = test_issue_reproduction()\n+    if not success:\n+        exit(1)\n+    else:\n+        exit(0)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

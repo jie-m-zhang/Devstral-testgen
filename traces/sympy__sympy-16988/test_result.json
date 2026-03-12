@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-16988",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.56247c51f7654856f8927c:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/sets/sets.py b/sympy/sets/sets.py\n--- a/sympy/sets/sets.py\n+++ b/sympy/sets/sets.py\n@@ -1260,7 +1260,7 @@ def __new__(cls, *args, **kwargs):\n         evaluate = kwargs.get('evaluate', global_evaluate[0])\n \n         # flatten inputs to merge intersections and iterables\n-        args = _sympify(args)\n+        args = list(ordered(set(_sympify(args))))\n \n         # Reduce sets using known rules\n         if evaluate:\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,39 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with Intersection not removing duplicates.\n+\n+The issue is that Intersection({1},{1},{x}) incorrectly returns EmptySet()\n+instead of Piecewise(({1}, Eq(x, 1)), (S.EmptySet, True)) or remaining unevaluated.\n+\"\"\"\n+\n+from sympy import Intersection, FiniteSet, Symbol, Piecewise, Eq, S\n+\n+def test_intersection_duplicates():\n+    \"\"\"Test that Intersection properly handles duplicate sets.\"\"\"\n+    x = Symbol('x')\n+\n+    # Test case 1: Intersection with duplicates {1}, {1}, {x}\n+    # This should return Piecewise(({1}, Eq(x, 1)), (S.EmptySet, True))\n+    # or remain unevaluated, NOT EmptySet()\n+    result1 = Intersection(FiniteSet(1), FiniteSet(1), FiniteSet(x))\n+    print(f\"Intersection({{1}}, {{1}}, {{x}}) = {result1}\")\n+\n+    # The result should NOT be EmptySet() - that's the bug\n+    # It should either be a Piecewise expression or an unevaluated Intersection\n+    is_empty = result1 == S.EmptySet\n+    print(f\"Result is EmptySet: {is_empty}\")\n+\n+    # Test case 2: Intersection without duplicates {1}, {x}\n+    # This should work correctly and return {1} when x=1\n+    result2 = Intersection(FiniteSet(1), FiniteSet(x))\n+    print(f\"Intersection({{1}}, {{x}}) = {result2}\")\n+\n+    # For the bug: when there are duplicates, the result should not be EmptySet\n+    # The fix removes duplicates at the outset, so both cases should behave similarly\n+    assert not (result1 == S.EmptySet), \\\n+        f\"FAIL: Intersection({{1}}, {{1}}, {{x}}) should not be EmptySet(), got {result1}\"\n+\n+    print(\"Test passed - issue is fixed\")\n+\n+if __name__ == \"__main__\":\n+    test_intersection_duplicates()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

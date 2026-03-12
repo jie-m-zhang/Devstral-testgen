@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-15345",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.86dbb918cd38e94c75046e:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/printing/mathematica.py b/sympy/printing/mathematica.py\n--- a/sympy/printing/mathematica.py\n+++ b/sympy/printing/mathematica.py\n@@ -31,7 +31,8 @@\n     \"asech\": [(lambda x: True, \"ArcSech\")],\n     \"acsch\": [(lambda x: True, \"ArcCsch\")],\n     \"conjugate\": [(lambda x: True, \"Conjugate\")],\n-\n+    \"Max\": [(lambda *x: True, \"Max\")],\n+    \"Min\": [(lambda *x: True, \"Min\")],\n }\n \n \n@@ -101,6 +102,8 @@ def _print_Function(self, expr):\n                     return \"%s[%s]\" % (mfunc, self.stringify(expr.args, \", \"))\n         return expr.func.__name__ + \"[%s]\" % self.stringify(expr.args, \", \")\n \n+    _print_MinMaxBase = _print_Function\n+\n     def _print_Integral(self, expr):\n         if len(expr.variables) == 1 and not expr.limits[0][1:]:\n             args = [expr.args[0], expr.variables[0]]\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,45 @@\n+#!/usr/bin/env python3\n+\"\"\"\n+Test to reproduce the issue with mathematica_code giving wrong output with Max.\n+\n+The issue: mathematica_code(Max(x,2)) outputs 'Max(2, x)' instead of 'Max[2, x]'\n+Expected: 'Max[2, x]' (valid Mathematica code with square brackets)\n+Actual (buggy): 'Max(2, x)' (invalid Mathematica code with parentheses)\n+\"\"\"\n+\n+from sympy import symbols, Max, Min, mathematica_code\n+\n+def test_max_output():\n+    \"\"\"Test that Max outputs correct Mathematica code with square brackets.\"\"\"\n+    x = symbols('x')\n+    result = mathematica_code(Max(x, 2))\n+    expected = \"Max[2, x]\"  # Max sorts its arguments, so order is (2, x)\n+\n+    print(f\"Result: {result}\")\n+    print(f\"Expected: {expected}\")\n+\n+    # This assertion will fail on buggy code, pass on fixed code\n+    assert result == expected, f\"Expected '{expected}', got '{result}'\"\n+\n+    print(\"Test passed - Max outputs correct Mathematica code\")\n+\n+def test_min_output():\n+    \"\"\"Test that Min outputs correct Mathematica code with square brackets.\"\"\"\n+    x = symbols('x')\n+    result = mathematica_code(Min(x, 2))\n+    expected = \"Min[2, x]\"  # Min sorts its arguments, so order is (2, x)\n+\n+    print(f\"Result: {result}\")\n+    print(f\"Expected: {expected}\")\n+\n+    # This assertion will fail on buggy code, pass on fixed code\n+    assert result == expected, f\"Expected '{expected}', got '{result}'\"\n+\n+    print(\"Test passed - Min outputs correct Mathematica code\")\n+\n+if __name__ == \"__main__\":\n+    print(\"Testing Max output...\")\n+    test_max_output()\n+    print(\"\\nTesting Min output...\")\n+    test_min_output()\n+    print(\"\\nAll tests passed!\")",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

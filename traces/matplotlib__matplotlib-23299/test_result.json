@@ -1,0 +1,16 @@
+{
+  "instance_id": "matplotlib__matplotlib-23299",
+  "base_image": "exec.eval.x86_64.b3179f57cacc7fd132d529.c9586cc3139ab831a35582:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/lib/matplotlib/__init__.py b/lib/matplotlib/__init__.py\n--- a/lib/matplotlib/__init__.py\n+++ b/lib/matplotlib/__init__.py\n@@ -1059,6 +1059,8 @@ def rc_context(rc=None, fname=None):\n     \"\"\"\n     Return a context manager for temporarily changing rcParams.\n \n+    The :rc:`backend` will not be reset by the context manager.\n+\n     Parameters\n     ----------\n     rc : dict\n@@ -1087,7 +1089,8 @@ def rc_context(rc=None, fname=None):\n              plt.plot(x, y)  # uses 'print.rc'\n \n     \"\"\"\n-    orig = rcParams.copy()\n+    orig = dict(rcParams.copy())\n+    del orig['backend']\n     try:\n         if fname:\n             rc_file(fname)\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,51 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue where get_backend() clears figures from Gcf.figs\n+if they were created under rc_context.\n+\"\"\"\n+\n+import matplotlib.pyplot as plt\n+from matplotlib import get_backend, rc_context\n+\n+def test_get_backend_clears_figures():\n+    \"\"\"\n+    Test that get_backend() does not clear figures from Gcf.figs\n+    when figures were created under rc_context.\n+    \"\"\"\n+    # Clear any existing figures\n+    plt.close('all')\n+\n+    # Create a figure inside an rc_context\n+    with rc_context():\n+        fig2 = plt.figure()\n+\n+    # Get the state before calling get_backend()\n+    before = f'{id(plt._pylab_helpers.Gcf)} {plt._pylab_helpers.Gcf.figs!r}'\n+\n+    # Call get_backend() - this is where the bug occurs\n+    backend = get_backend()\n+\n+    # Get the state after calling get_backend()\n+    after = f'{id(plt._pylab_helpers.Gcf)} {plt._pylab_helpers.Gcf.figs!r}'\n+\n+    # The assertion should fail on buggy code, pass on fixed code\n+    assert before == after, (\n+        f'get_backend() cleared figures from Gcf.figs!\\n'\n+        f'Before: {before}\\n'\n+        f'After:  {after}\\n'\n+        f'Backend: {backend}'\n+    )\n+\n+    # Additional check: ensure the figure is still in Gcf.figs\n+    assert len(plt._pylab_helpers.Gcf.figs) > 0, (\n+        f'Gcf.figs should not be empty after get_backend()!\\n'\n+        f'Backend: {backend}'\n+    )\n+\n+    # Clean up\n+    plt.close('all')\n+\n+    print(\"Test passed - issue is fixed\")\n+\n+if __name__ == \"__main__\":\n+    test_get_backend_clears_figures()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

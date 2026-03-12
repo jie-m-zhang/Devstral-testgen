@@ -1,0 +1,16 @@
+{
+  "instance_id": "django__django-11133",
+  "base_image": "exec.eval.x86_64.ee2ad6945f237e9160354f.c70dd22ef4e1c836095a8a:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/django/http/response.py b/django/http/response.py\n--- a/django/http/response.py\n+++ b/django/http/response.py\n@@ -229,7 +229,7 @@ def make_bytes(self, value):\n         # Handle string types -- we can't rely on force_bytes here because:\n         # - Python attempts str conversion first\n         # - when self._charset != 'utf-8' it re-encodes the content\n-        if isinstance(value, bytes):\n+        if isinstance(value, (bytes, memoryview)):\n             return bytes(value)\n         if isinstance(value, str):\n             return bytes(value.encode(self.charset))\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,51 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with HttpResponse not handling memoryview objects correctly.\n+\n+The issue: When a memoryview object is passed to HttpResponse, it should be converted\n+to bytes properly, but currently it's showing the memoryview object representation\n+instead of the actual content.\n+\n+Expected behavior:\n+- HttpResponse(memoryview(b\"My Content\")).content should return b'My Content'\n+\n+Buggy behavior (base commit):\n+- HttpResponse(memoryview(b\"My Content\")).content returns b'<memory at 0x...>'\n+\"\"\"\n+\n+import django\n+from django.conf import settings\n+\n+# Configure Django settings\n+if not settings.configured:\n+    settings.configure(\n+        DEBUG=True,\n+        SECRET_KEY='test-secret-key',\n+        DEFAULT_CHARSET='utf-8',\n+    )\n+    django.setup()\n+\n+from django.http import HttpResponse\n+\n+def test_memoryview_handling():\n+    \"\"\"Test that HttpResponse correctly handles memoryview objects.\"\"\"\n+    # Test with regular bytes (should work)\n+    response_bytes = HttpResponse(b\"My Content\")\n+    assert response_bytes.content == b\"My Content\", f\"Expected b'My Content', got {response_bytes.content}\"\n+\n+    # Test with string (should work)\n+    response_str = HttpResponse(\"My Content\")\n+    assert response_str.content == b\"My Content\", f\"Expected b'My Content', got {response_str.content}\"\n+\n+    # Test with memoryview (this is the bug we're testing)\n+    test_data = b\"My Content\"\n+    memory_view = memoryview(test_data)\n+    response_mv = HttpResponse(memory_view)\n+\n+    # This assertion should fail on the buggy version and pass on the fixed version\n+    assert response_mv.content == b\"My Content\", f\"Expected b'My Content', got {response_mv.content}\"\n+\n+    print(\"Test passed - memoryview is handled correctly\")\n+\n+if __name__ == \"__main__\":\n+    test_memoryview_handling()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

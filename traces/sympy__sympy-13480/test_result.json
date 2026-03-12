@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-13480",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.b6b5e1c0e2493aadff9d02:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/functions/elementary/hyperbolic.py b/sympy/functions/elementary/hyperbolic.py\n--- a/sympy/functions/elementary/hyperbolic.py\n+++ b/sympy/functions/elementary/hyperbolic.py\n@@ -587,7 +587,7 @@ def eval(cls, arg):\n                 x, m = _peeloff_ipi(arg)\n                 if m:\n                     cothm = coth(m)\n-                    if cotm is S.ComplexInfinity:\n+                    if cothm is S.ComplexInfinity:\n                         return coth(x)\n                     else: # cothm == 0\n                         return tanh(x)\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,29 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with coth(log(tan(x))).subs(x, 2)\n+The issue is a NameError: name 'cotm' is not defined in hyperbolic.py\n+\"\"\"\n+\n+from sympy import Symbol, coth, log, tan\n+\n+def test_coth_log_tan_subs():\n+    \"\"\"Test that coth(log(tan(x))).subs(x, 2) works without NameError\"\"\"\n+    x = Symbol('x')\n+    e = coth(log(tan(x)))\n+\n+    # This should not raise a NameError\n+    # On the buggy version, this will fail with:\n+    # NameError: name 'cotm' is not defined\n+    try:\n+        result = e.subs(x, 2)\n+        print(f\"Test passed - result: {result}\")\n+        return True\n+    except NameError as e:\n+        print(f\"Test failed with NameError: {e}\")\n+        return False\n+\n+if __name__ == \"__main__\":\n+    success = test_coth_log_tan_subs()\n+    if not success:\n+        exit(1)\n+    exit(0)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

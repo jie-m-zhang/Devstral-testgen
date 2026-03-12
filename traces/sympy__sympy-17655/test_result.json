@@ -1,0 +1,14 @@
+{
+  "instance_id": "sympy__sympy-17655",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.463d9dc04f7878b4c3f13f:latest",
+  "test_commands": [],
+  "new_patch": "diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py\n--- a/sympy/geometry/point.py\n+++ b/sympy/geometry/point.py\n@@ -278,6 +278,10 @@ def __mul__(self, factor):\n         coords = [simplify(x*factor) for x in self.args]\n         return Point(coords, evaluate=False)\n \n+    def __rmul__(self, factor):\n+        \"\"\"Multiply a factor by point's coordinates.\"\"\"\n+        return self.__mul__(factor)\n+\n     def __neg__(self):\n         \"\"\"Negate the point.\"\"\"\n         coords = [-x for x in self.args]\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,2 @@\n+point1 + point2 * sympy.sympify(2.0)  # works fine\n+point1 + sympy.sympify(2.0) * point2  # raises GeometryError",
+  "success": false,
+  "validation_passed": false,
+  "repair_attempts": 4,
+  "exception": "FAILS_ON_HEAD",
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 1
+}

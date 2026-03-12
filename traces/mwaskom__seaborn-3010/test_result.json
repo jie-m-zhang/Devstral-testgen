@@ -1,0 +1,16 @@
+{
+  "instance_id": "mwaskom__seaborn-3010",
+  "base_image": "exec.eval.x86_64.f38d9a116162fe978a8db0.bc691e3c855552f10e19da:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/seaborn/_stats/regression.py b/seaborn/_stats/regression.py\n--- a/seaborn/_stats/regression.py\n+++ b/seaborn/_stats/regression.py\n@@ -38,7 +38,10 @@ def _fit_predict(self, data):\n \n     def __call__(self, data, groupby, orient, scales):\n \n-        return groupby.apply(data, self._fit_predict)\n+        return (\n+            groupby\n+            .apply(data.dropna(subset=[\"x\", \"y\"]), self._fit_predict)\n+        )\n \n \n @dataclass\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,56 @@\n+\"\"\"\n+Test to reproduce the issue with PolyFit not being robust to missing data.\n+\n+The issue is that when there's a None value in the data, PolyFit fails with a LinAlgError.\n+This test should FAIL on the base commit and PASS on the head commit.\n+\"\"\"\n+\n+import numpy as np\n+import pandas as pd\n+import pytest\n+from numpy.testing import assert_array_equal\n+\n+# Import the PolyFit stat directly\n+from seaborn._stats.regression import PolyFit\n+from seaborn._core.groupby import GroupBy\n+\n+def test_polyfit_with_missing_data():\n+    \"\"\"\n+    Test that PolyFit handles missing data (None values) gracefully.\n+\n+    This test reproduces the issue by directly calling PolyFit on data with None values.\n+    \"\"\"\n+\n+    # Create data with missing values (None)\n+    df = pd.DataFrame({\n+        'x': [1, 2, 3, None, 4],\n+        'y': [1, 2, 3, 4, 5],\n+        'group': ['a', 'a', 'a', 'a', 'a']  # Add a grouping column\n+    })\n+\n+    # Create a GroupBy object with a grouping variable\n+    groupby = GroupBy([\"group\"])\n+\n+    # Try to fit PolyFit - this should trigger the error\n+    # On the base commit, this will raise LinAlgError\n+    # On the head commit, this should work fine\n+    try:\n+        result = PolyFit()(df, groupby, \"x\", {})\n+        # If we get here, the fit was successful\n+        result_check = True\n+    except np.linalg.LinAlgError as e:\n+        # If we get a LinAlgError, the bug is present\n+        result_check = False\n+        print(f\"LinAlgError occurred: {e}\")\n+        raise  # Re-raise to see the full traceback\n+\n+    # Assert that the fit was successful (no LinAlgError)\n+    assert result_check, \"PolyFit should handle missing data without raising LinAlgError\"\n+\n+    # Also check that the result is not empty\n+    assert len(result) > 0, \"PolyFit should return non-empty result\"\n+\n+    print(\"Test passed - PolyFit handles missing data correctly\")\n+\n+if __name__ == \"__main__\":\n+    test_polyfit_with_missing_data()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

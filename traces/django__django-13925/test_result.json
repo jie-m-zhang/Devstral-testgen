@@ -1,0 +1,14 @@
+{
+  "instance_id": "django__django-13925",
+  "base_image": "exec.eval.x86_64.ebed327f02c059ebd6024a.af67c5ddb19d224b480540:latest",
+  "test_commands": [],
+  "new_patch": "diff --git a/django/db/models/base.py b/django/db/models/base.py\n--- a/django/db/models/base.py\n+++ b/django/db/models/base.py\n@@ -1299,6 +1299,11 @@ def check(cls, **kwargs):\n     def _check_default_pk(cls):\n         if (\n             cls._meta.pk.auto_created and\n+            # Inherited PKs are checked in parents models.\n+            not (\n+                isinstance(cls._meta.pk, OneToOneField) and\n+                cls._meta.pk.remote_field.parent_link\n+            ) and\n             not settings.is_overridden('DEFAULT_AUTO_FIELD') and\n             not cls._meta.app_config._is_default_auto_field_overridden\n         ):\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,8 @@\n+from django.db import models\n+\n+class Entity(models.Model):\n+    id = models.BigAutoField(primary_key=True)\n+    name = models.CharField(max_length=100)\n+\n+class User(Entity):\n+    email = models.EmailField()",
+  "success": false,
+  "validation_passed": false,
+  "repair_attempts": 4,
+  "exception": "FAILS_ON_HEAD",
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 1
+}

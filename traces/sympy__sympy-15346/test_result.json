@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-15346",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.86dbb918cd38e94c75046e:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/simplify/trigsimp.py b/sympy/simplify/trigsimp.py\n--- a/sympy/simplify/trigsimp.py\n+++ b/sympy/simplify/trigsimp.py\n@@ -1143,8 +1143,8 @@ def _futrig(e, **kwargs):\n         lambda x: _eapply(factor, x, trigs),\n         TR14,  # factored powers of identities\n         [identity, lambda x: _eapply(_mexpand, x, trigs)],\n-        TRmorrie,\n         TR10i,  # sin-cos products > sin-cos of sums\n+        TRmorrie,\n         [identity, TR8],  # sin-cos products -> sin-cos of sums\n         [identity, lambda x: TR2i(TR2(x))],  # tan -> sin-cos -> tan\n         [\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,30 @@\n+from sympy import *\n+\n+def test_trig_simplify_with_rational():\n+    \"\"\"\n+    Test that trigonometric expressions with Rational numbers simplify correctly.\n+    This reproduces the issue where sin/cos with Rational numbers don't simplify.\n+    \"\"\"\n+    # Test case 1: With symbols - this should work\n+    x, y = symbols('x, y', real=True)\n+    r_symbols = sin(x)*sin(y) + cos(x)*cos(y)\n+    r_symbols_simplified = r_symbols.simplify()\n+    print(f\"Symbols: {r_symbols} -> {r_symbols_simplified}\")\n+    assert r_symbols_simplified == cos(x - y), f\"Expected cos(x - y), got {r_symbols_simplified}\"\n+\n+    # Test case 2: With Rational numbers - this should also work but currently doesn't\n+    r_rational = sin(Rational(1, 50))*sin(Rational(1, 25)) + cos(Rational(1, 50))*cos(Rational(1, 25))\n+    r_rational_simplified = r_rational.simplify()\n+    print(f\"Rational: {r_rational} -> {r_rational_simplified}\")\n+\n+    # The expected simplified form should be cos(Rational(1, 50) - Rational(1, 25))\n+    expected = cos(Rational(1, 50) - Rational(1, 25))\n+    print(f\"Expected: {expected}\")\n+\n+    # This assertion should fail on the buggy version and pass on the fixed version\n+    assert r_rational_simplified == expected, f\"Expected {expected}, got {r_rational_simplified}\"\n+\n+    print(\"Test passed - trigonometric simplification with Rational numbers works correctly\")\n+\n+if __name__ == \"__main__\":\n+    test_trig_simplify_with_rational()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

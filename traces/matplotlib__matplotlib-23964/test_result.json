@@ -1,0 +1,16 @@
+{
+  "instance_id": "matplotlib__matplotlib-23964",
+  "base_image": "exec.eval.x86_64.2d6052d0094739c9380d87.758afe88af347cab20d2e7:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/lib/matplotlib/backends/backend_ps.py b/lib/matplotlib/backends/backend_ps.py\n--- a/lib/matplotlib/backends/backend_ps.py\n+++ b/lib/matplotlib/backends/backend_ps.py\n@@ -665,8 +665,9 @@ def draw_text(self, gc, x, y, s, prop, angle, ismath=False, mtext=None):\n                 curr_stream[1].append(\n                     (item.x, item.ft_object.get_glyph_name(item.glyph_idx))\n                 )\n-            # append the last entry\n-            stream.append(curr_stream)\n+            # append the last entry if exists\n+            if curr_stream:\n+                stream.append(curr_stream)\n \n         self.set_color(*gc.get_rgb())\n \n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,48 @@\n+\"\"\"\n+Test to reproduce the issue where a text label with empty line causes\n+a \"TypeError: cannot unpack non-iterable NoneType object\" in PostScript backend.\n+\n+This test should:\n+- FAIL on base commit (269c0b94b4fcf8b1135011c1556eac29dc09de15) with TypeError\n+- PASS on head commit (73909bcb408886a22e2b84581d6b9e6d9907c813) after fix\n+\"\"\"\n+\n+from matplotlib.figure import Figure\n+import tempfile\n+import os\n+\n+def test_empty_line_in_text_label():\n+    \"\"\"\n+    Test that a figure with a text label containing an empty line\n+    can be saved as PostScript without error.\n+    \"\"\"\n+    # Create a figure with an annotation containing an empty line\n+    figure = Figure()\n+    ax = figure.add_subplot(111)\n+    ax.annotate(text='\\nLower label', xy=(0, 0))\n+\n+    # Try to save as PostScript - this should trigger the bug on base commit\n+    with tempfile.NamedTemporaryFile(suffix='.eps', delete=False) as tmp:\n+        try:\n+            figure.savefig(tmp.name)\n+            # If we get here, the save was successful\n+            print(\"Figure saved successfully - test PASSED\")\n+            return True\n+        except TypeError as e:\n+            if \"cannot unpack non-iterable NoneType object\" in str(e):\n+                print(f\"TypeError occurred as expected: {e}\")\n+                print(\"Test FAILED (reproduced the bug)\")\n+                return False\n+            else:\n+                # Different TypeError - re-raise\n+                raise\n+        finally:\n+            # Clean up\n+            if os.path.exists(tmp.name):\n+                os.unlink(tmp.name)\n+\n+if __name__ == \"__main__\":\n+    success = test_empty_line_in_text_label()\n+    if not success:\n+        exit(1)  # Exit with non-zero code to indicate failure\n+    exit(0)  # Exit with zero code to indicate success",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

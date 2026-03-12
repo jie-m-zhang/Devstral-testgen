@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-13971",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.34f1553c5e365585c16b75:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py\n--- a/sympy/printing/latex.py\n+++ b/sympy/printing/latex.py\n@@ -1657,9 +1657,9 @@ def _print_SeqFormula(self, s):\n         else:\n             printset = tuple(s)\n \n-        return (r\"\\left\\[\"\n+        return (r\"\\left[\"\n               + r\", \".join(self._print(el) for el in printset)\n-              + r\"\\right\\]\")\n+              + r\"\\right]\")\n \n     _print_SeqPer = _print_SeqFormula\n     _print_SeqAdd = _print_SeqFormula\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,40 @@\n+\"\"\"\n+Test to reproduce the issue with SeqFormula() displaying backslash-escaped brackets.\n+\n+The issue is that the LaTeX output for SeqFormula uses \\[ and \\] which are\n+being escaped as \\left\\[ and \\right\\] in the output. The fix changes these to\n+[ and ] without the backslash.\n+\"\"\"\n+\n+import sympy as sp\n+\n+def test_seqformula_brackets():\n+    \"\"\"Test that SeqFormula LaTeX output doesn't use backslash-escaped brackets.\"\"\"\n+    # Create a simple sequence\n+    n = sp.symbols('n', integer=True)\n+    seq = sp.SeqFormula(n**2, (n, 0, sp.oo))\n+\n+    # Get the LaTeX representation\n+    latex_output = sp.latex(seq)\n+\n+    print(f\"LaTeX output: {latex_output}\")\n+\n+    # The buggy version produces: \\left\\[0, 1, 4, 9, \\ldots\\right\\]\n+    # The fixed version should produce: \\left[0, 1, 4, 9, \\ldots\\right]\n+\n+    # Check that the output does NOT contain backslash-escaped brackets\n+    # In the buggy version, we get \\left\\[ and \\right\\]\n+    # In the fixed version, we get \\left[ and \\right]\n+\n+    # The test should FAIL on buggy code (base commit) and PASS on fixed code (head commit)\n+    assert r'\\left[' in latex_output, f\"Expected '\\\\left[' in output, got: {latex_output}\"\n+    assert r'\\right]' in latex_output, f\"Expected '\\\\right]' in output, got: {latex_output}\"\n+\n+    # These should NOT be present in the fixed version\n+    assert r'\\left\\[' not in latex_output, f\"Found backslash-escaped '\\\\left\\[' in output: {latex_output}\"\n+    assert r'\\right\\]' not in latex_output, f\"Found backslash-escaped '\\\\right\\]' in output: {latex_output}\"\n+\n+    print(\"Test passed - SeqFormula uses correct brackets without backslash escaping\")\n+\n+if __name__ == \"__main__\":\n+    test_seqformula_brackets()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

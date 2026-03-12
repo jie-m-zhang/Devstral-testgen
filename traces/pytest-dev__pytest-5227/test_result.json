@@ -1,0 +1,14 @@
+{
+  "instance_id": "pytest-dev__pytest-5227",
+  "base_image": "exec.eval.x86_64.09889d34f5e9cb2bb80279.a57abea8fc47b26119060c:latest",
+  "test_commands": [],
+  "new_patch": "diff --git a/src/_pytest/logging.py b/src/_pytest/logging.py\n--- a/src/_pytest/logging.py\n+++ b/src/_pytest/logging.py\n@@ -15,7 +15,7 @@\n from _pytest.config import create_terminal_writer\n from _pytest.pathlib import Path\n \n-DEFAULT_LOG_FORMAT = \"%(filename)-25s %(lineno)4d %(levelname)-8s %(message)s\"\n+DEFAULT_LOG_FORMAT = \"%(levelname)-8s %(name)s:%(filename)s:%(lineno)d %(message)s\"\n DEFAULT_LOG_DATE_FORMAT = \"%H:%M:%S\"\n \n \n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,39 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the logging format issue.\n+\n+The issue is that the default log format should include the logger name (module name)\n+instead of just the base filename.\n+\n+Expected format (after fix):\n+\"%(levelname)-8s %(name)s:%(filename)s:%(lineno)d %(message)s\"\n+\n+Old format (buggy):\n+\"%(filename)-25s %(lineno)4d %(levelname)-8s %(message)s\"\n+\"\"\"\n+\n+def test_default_log_format():\n+    \"\"\"Test that DEFAULT_LOG_FORMAT includes the logger name.\"\"\"\n+    from _pytest.logging import DEFAULT_LOG_FORMAT\n+\n+    # The expected format after the fix\n+    expected_format = \"%(levelname)-8s %(name)s:%(filename)s:%(lineno)d %(message)s\"\n+\n+    # The old format (buggy)\n+    old_format = \"%(filename)-25s %(lineno)4d %(levelname)-8s %(message)s\"\n+\n+    print(f\"Current DEFAULT_LOG_FORMAT: {DEFAULT_LOG_FORMAT}\")\n+    print(f\"Expected format: {expected_format}\")\n+    print(f\"Old format: {old_format}\")\n+\n+    # This assertion will fail on the buggy version (base commit)\n+    # and pass on the fixed version (head commit)\n+    assert DEFAULT_LOG_FORMAT == expected_format, (\n+        f\"DEFAULT_LOG_FORMAT should be '{expected_format}', \"\n+        f\"but got '{DEFAULT_LOG_FORMAT}'\"\n+    )\n+\n+    print(\"\u2713 Test passed - DEFAULT_LOG_FORMAT includes logger name\")\n+\n+if __name__ == \"__main__\":\n+    test_default_log_format()",
+  "success": false,
+  "validation_passed": false,
+  "repair_attempts": 4,
+  "exception": "FAILS_ON_HEAD",
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 1
+}

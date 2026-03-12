@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-11400",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.7062b86350ec097b169076:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/printing/ccode.py b/sympy/printing/ccode.py\n--- a/sympy/printing/ccode.py\n+++ b/sympy/printing/ccode.py\n@@ -231,6 +231,20 @@ def _print_Symbol(self, expr):\n         else:\n             return name\n \n+    def _print_Relational(self, expr):\n+        lhs_code = self._print(expr.lhs)\n+        rhs_code = self._print(expr.rhs)\n+        op = expr.rel_op\n+        return (\"{0} {1} {2}\").format(lhs_code, op, rhs_code)\n+\n+    def _print_sinc(self, expr):\n+        from sympy.functions.elementary.trigonometric import sin\n+        from sympy.core.relational import Ne\n+        from sympy.functions import Piecewise\n+        _piecewise = Piecewise(\n+            (sin(expr.args[0]) / expr.args[0], Ne(expr.args[0], 0)), (1, True))\n+        return self._print(_piecewise)\n+\n     def _print_AugmentedAssignment(self, expr):\n         lhs_code = self._print(expr.lhs)\n         op = expr.rel_op\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,37 @@\n+#!/usr/bin/env python3\n+\"\"\"\n+Test to reproduce the issue with ccode(sinc(x)) not working properly.\n+\n+The issue is that ccode(sinc(x)) currently outputs:\n+'// Not supported in C:\\\\n// sinc\\\\nsinc(x)'\n+\n+But it should output a Piecewise expression like:\n+'((x != 0) ? (\\\\n   sin(x)/x\\\\n)\\\\n: (\\\\n   1\\\\n))'\n+\"\"\"\n+\n+from sympy import sinc, symbols, ccode, Piecewise, sin, Ne\n+\n+def test_issue_reproduction():\n+    \"\"\"Test that ccode(sinc(x)) produces the correct output.\"\"\"\n+    x = symbols('x')\n+\n+    # Get the current output from ccode(sinc(x))\n+    result = ccode(sinc(x))\n+\n+    # The expected output should be a Piecewise expression\n+    # that represents sinc(x) = sin(x)/x for x != 0, and 1 for x = 0\n+    # Note: Ne(x, 0) gets printed as \"x != 0\" in C code\n+    expected_output = '((x != 0) ? (\\n   sin(x)/x\\n)\\n: (\\n   1\\n))'\n+\n+    # Print for debugging\n+    print(f\"Current output: {repr(result)}\")\n+    print(f\"Expected output: {repr(expected_output)}\")\n+\n+    # This assertion will fail on buggy code, pass on fixed code\n+    # The test checks that ccode(sinc(x)) produces the correct Piecewise output\n+    assert result == expected_output, f\"Expected {repr(expected_output)}, got {repr(result)}\"\n+\n+    print(\"Test passed - issue is fixed\")\n+\n+if __name__ == \"__main__\":\n+    test_issue_reproduction()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

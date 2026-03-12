@@ -1,0 +1,41 @@
+2026-02-11 08:13:04,796 - INFO - Starting test generation for sympy__sympy-13480 using SWT-bench containers
+2026-02-11 08:13:04,796 - INFO - Detected language: python
+2026-02-11 08:13:04,797 - INFO - Using Docker mode (runtime setup) for sympy__sympy-13480
+2026-02-11 08:13:04,816 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:13:16,258 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:13:16,259 - INFO - Starting container (attempt 1/5): swt-jie.zhang-sympy__sympy-13480-041128
+2026-02-11 08:13:17,200 - INFO - Container started: 6a659bb50fb36a7baf1d4c572f9b4dc6d2d68a32214f5e6cb3a61eecc262ee30
+2026-02-11 08:13:17,200 - INFO - Running repo setup at runtime...
+2026-02-11 08:13:17,252 - ERROR - Error during repo setup: 404 Client Error for http://docker-service:2375/v1.53/exec/3344c9509f740a51537101189ab73883768f9fc9e4a8a5e83053e779e0f55b3a/json: Not Found ("No such exec instance: 3344c9509f740a51537101189ab73883768f9fc9e4a8a5e83053e779e0f55b3a")
+2026-02-11 08:13:17,252 - WARNING - Container start attempt 1 failed: Failed to run repo setup
+2026-02-11 08:13:19,256 - INFO - Starting container (attempt 2/5): swt-jie.zhang-sympy__sympy-13480-af0339
+2026-02-11 08:13:19,259 - WARNING - Image was garbage collected, re-pulling: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:13:28,469 - INFO - Re-pulled image: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:13:28,856 - INFO - Container started: d3e59a4d8b28b1fe35c72bd3c1b0b6a699e88c9786d977b7faacd5a4420be675
+2026-02-11 08:13:28,856 - INFO - Running repo setup at runtime...
+2026-02-11 08:13:28,887 - ERROR - Error during repo setup: 404 Client Error for http://docker-service:2375/v1.53/exec/4d64809c0f892b4b79d11b2cfd9042e7b755c809a49b1a247a5149072ff64044/json: Not Found ("No such exec instance: 4d64809c0f892b4b79d11b2cfd9042e7b755c809a49b1a247a5149072ff64044")
+2026-02-11 08:13:28,887 - WARNING - Container start attempt 2 failed: Failed to run repo setup
+2026-02-11 08:13:32,890 - INFO - Starting container (attempt 3/5): swt-jie.zhang-sympy__sympy-13480-f64129
+2026-02-11 08:13:32,893 - WARNING - Image was garbage collected, re-pulling: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 11:43:21,335 - INFO - Starting test generation for sympy__sympy-13480 using SWT-bench containers
+2026-02-11 11:43:21,335 - INFO - Detected language: python
+2026-02-11 11:43:21,335 - INFO - Using Docker mode (runtime setup) for sympy__sympy-13480
+2026-02-11 11:43:21,374 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 11:43:21,374 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 11:43:22,101 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 11:43:22,102 - INFO - Starting container (attempt 1/5): swt-jie.zhang-sympy__sympy-13480-9e5155
+2026-02-11 11:43:22,674 - INFO - Container started: 467307fb1cc5011c6a6b719b1947e361f8ae931741cdff0a6faebe413f152d4c
+2026-02-11 11:43:22,675 - INFO - Running repo setup at runtime...
+2026-02-11 11:43:37,711 - INFO - Repo setup completed successfully
+2026-02-11 11:43:37,711 - INFO - === GENERATION PHASE ===
+2026-02-11 11:43:37,712 - INFO - === GENERATION PHASE ===
+2026-02-11 11:44:05,855 - INFO - Generation completed
+2026-02-11 11:44:06,411 - INFO - Found test file at: /testbed/test_reproduce.py
+2026-02-11 11:44:06,411 - INFO - === VALIDATION + REPAIR LOOP ===
+2026-02-11 11:44:06,732 - INFO - Using run command: cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-11 11:44:06,733 - INFO - Validation attempt 1/4
+2026-02-11 11:44:17,430 - INFO - F->P verification PASSED: base_exit=1, head_exit=0
+2026-02-11 11:44:17,430 - INFO - Validation PASSED!
+2026-02-11 11:44:17,436 - INFO - Attempting to stop container swt-jie.zhang-sympy__sympy-13480-9e5155...
+2026-02-11 11:44:32,966 - INFO - Attempting to remove container swt-jie.zhang-sympy__sympy-13480-9e5155...
+2026-02-11 11:44:33,158 - INFO - Container swt-jie.zhang-sympy__sympy-13480-9e5155 removed.

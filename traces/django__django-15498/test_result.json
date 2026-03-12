@@ -1,0 +1,16 @@
+{
+  "instance_id": "django__django-15498",
+  "base_image": "exec.eval.x86_64.6b24dca158642bd6288384.e97f2b6b8388e118714b39:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/django/views/static.py b/django/views/static.py\n--- a/django/views/static.py\n+++ b/django/views/static.py\n@@ -129,12 +129,14 @@ def was_modified_since(header=None, mtime=0, size=0):\n         if header is None:\n             raise ValueError\n         matches = re.match(r\"^([^;]+)(; length=([0-9]+))?$\", header, re.IGNORECASE)\n+        if matches is None:\n+            raise ValueError\n         header_mtime = parse_http_date(matches[1])\n         header_len = matches[3]\n         if header_len and int(header_len) != size:\n             raise ValueError\n         if int(mtime) > header_mtime:\n             raise ValueError\n-    except (AttributeError, ValueError, OverflowError):\n+    except (ValueError, OverflowError):\n         return True\n     return False\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,31 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with empty string handling in If-Modified-Since header.\n+\n+The issue: Empty string used to be ignored for If-Modified-Since header, but now raises exception.\n+\"\"\"\n+\n+import sys\n+sys.path.insert(0, '/testbed')\n+\n+from django.views.static import was_modified_since\n+\n+def test_empty_string():\n+    \"\"\"Test that empty string doesn't raise TypeError.\"\"\"\n+    print(\"Testing empty string...\")\n+\n+    try:\n+        result = was_modified_since(header=\"\", mtime=1000)\n+        print(f\"Result: {result}\")\n+        print(\"\u2713 No exception raised\")\n+        return True\n+    except TypeError as e:\n+        print(f\"\u2717 TypeError raised: {e}\")\n+        return False\n+    except Exception as e:\n+        print(f\"\u2717 Other exception: {type(e).__name__}: {e}\")\n+        return False\n+\n+if __name__ == \"__main__\":\n+    success = test_empty_string()\n+    sys.exit(0 if success else 1)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

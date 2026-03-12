@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-17022",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.33750ac9eb35db95ce92d2:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/printing/pycode.py b/sympy/printing/pycode.py\n--- a/sympy/printing/pycode.py\n+++ b/sympy/printing/pycode.py\n@@ -608,6 +608,13 @@ def _print_MatrixBase(self, expr):\n             func = self._module_format('numpy.array')\n         return \"%s(%s)\" % (func, self._print(expr.tolist()))\n \n+    def _print_Identity(self, expr):\n+        shape = expr.shape\n+        if all([dim.is_Integer for dim in shape]):\n+            return \"%s(%s)\" % (self._module_format('numpy.eye'), self._print(expr.shape[0]))\n+        else:\n+            raise NotImplementedError(\"Symbolic matrix dimensions are not yet supported for identity matrices\")\n+\n     def _print_BlockMatrix(self, expr):\n         return '{0}({1})'.format(self._module_format('numpy.block'),\n                                  self._print(expr.args[0].tolist()))\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,42 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with lambdify misinterpreting identity matrices.\n+\n+The issue is that lambdify incorrectly interprets 'I' as the complex number 1j\n+instead of the identity matrix when working with matrix expressions.\n+\"\"\"\n+\n+import numpy as np\n+from sympy import symbols, MatrixSymbol, Identity, lambdify\n+\n+def test_identity_matrix_lambdify():\n+    \"\"\"Test that lambdify correctly handles identity matrices.\"\"\"\n+    # Create a matrix symbol with concrete size (2x2)\n+    A = MatrixSymbol(\"A\", 2, 2)\n+\n+    # Create a test numpy array\n+    a = np.array([[1, 2], [3, 4]])\n+\n+    # Create a lambdified function that adds identity matrix to A\n+    f = lambdify(A, A + Identity(2))\n+\n+    # Apply the function to the test array\n+    result = f(a)\n+\n+    # Expected result: adding identity matrix to a\n+    # [[1, 2], [3, 4]] + [[1, 0], [0, 1]] = [[2, 2], [3, 5]]\n+    expected = np.array([[2, 2], [3, 5]])\n+\n+    # Check if result is correct\n+    print(f\"Result: {result}\")\n+    print(f\"Expected: {expected}\")\n+\n+    # The test should fail on buggy version (I interpreted as 1j)\n+    # and pass on fixed version (I interpreted as identity matrix)\n+    assert np.allclose(result, expected), \\\n+        f\"Expected {expected}, but got {result}. Identity matrix was not correctly interpreted.\"\n+\n+    print(\"Test passed - identity matrix correctly interpreted\")\n+\n+if __name__ == \"__main__\":\n+    test_identity_matrix_lambdify()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

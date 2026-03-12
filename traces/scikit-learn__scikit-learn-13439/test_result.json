@@ -1,0 +1,16 @@
+{
+  "instance_id": "scikit-learn__scikit-learn-13439",
+  "base_image": "exec.eval.x86_64.437918b9cd24690e5e9c56.6696b735fc54c36e1ee0d2:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sklearn/pipeline.py b/sklearn/pipeline.py\n--- a/sklearn/pipeline.py\n+++ b/sklearn/pipeline.py\n@@ -199,6 +199,12 @@ def _iter(self, with_final=True):\n             if trans is not None and trans != 'passthrough':\n                 yield idx, name, trans\n \n+    def __len__(self):\n+        \"\"\"\n+        Returns the length of the Pipeline\n+        \"\"\"\n+        return len(self.steps)\n+\n     def __getitem__(self, ind):\n         \"\"\"Returns a sub-pipeline or a single esimtator in the pipeline\n \n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,36 @@\n+\"\"\"\n+Test to reproduce the issue where Pipeline should implement __len__\n+\"\"\"\n+from sklearn import svm\n+from sklearn.datasets import samples_generator\n+from sklearn.feature_selection import SelectKBest\n+from sklearn.feature_selection import f_regression\n+from sklearn.pipeline import Pipeline\n+\n+def test_pipeline_len():\n+    \"\"\"\n+    Test that Pipeline implements __len__ method.\n+    This should fail on base commit (no __len__) and pass on head commit (with __len__).\n+    \"\"\"\n+    # Generate some data to play with\n+    X, y = samples_generator.make_classification(\n+        n_informative=5, n_redundant=0, random_state=42)\n+\n+    anova_filter = SelectKBest(f_regression, k=5)\n+    clf = svm.SVC(kernel='linear')\n+    pipe = Pipeline([('anova', anova_filter), ('svc', clf)])\n+\n+    # This should work - get the length of the pipeline\n+    pipe_length = len(pipe)\n+\n+    # The pipeline has 2 steps, so length should be 2\n+    assert pipe_length == 2, f\"Expected pipeline length to be 2, got {pipe_length}\"\n+\n+    # Also test that pipe[:len(pipe)] works as mentioned in the issue\n+    sub_pipeline = pipe[:len(pipe)]\n+    assert len(sub_pipeline) == pipe_length, f\"Expected sub-pipeline length to be {pipe_length}, got {len(sub_pipeline)}\"\n+\n+    print(\"Test passed - Pipeline.__len__ is working correctly\")\n+\n+if __name__ == \"__main__\":\n+    test_pipeline_len()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

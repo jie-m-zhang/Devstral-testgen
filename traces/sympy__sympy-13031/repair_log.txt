@@ -1,0 +1,46 @@
+2026-02-11 08:12:44,901 - INFO - Starting test generation for sympy__sympy-13031 using SWT-bench containers
+2026-02-11 08:12:44,901 - INFO - Detected language: python
+2026-02-11 08:12:44,902 - INFO - Using Docker mode (runtime setup) for sympy__sympy-13031
+2026-02-11 08:12:44,920 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:12:59,273 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:12:59,274 - INFO - Starting container (attempt 1/5): swt-jie.zhang-sympy__sympy-13031-bddd56
+2026-02-11 08:13:00,031 - INFO - Container started: 5562982f28ba77c225470a135cb4988038c503568e18c6243926a43d6f2aca52
+2026-02-11 08:13:00,031 - INFO - Running repo setup at runtime...
+2026-02-11 08:13:10,594 - ERROR - Error during repo setup: 404 Client Error for http://docker-service:2375/v1.53/exec/38a7eb6da0681e1305842f2a572f462b21a2f7b3f4401ed0353f36b5e93296cc/json: Not Found ("No such exec instance: 38a7eb6da0681e1305842f2a572f462b21a2f7b3f4401ed0353f36b5e93296cc")
+2026-02-11 08:13:10,595 - WARNING - Container start attempt 1 failed: Failed to run repo setup
+2026-02-11 08:13:12,598 - INFO - Starting container (attempt 2/5): swt-jie.zhang-sympy__sympy-13031-4ee523
+2026-02-11 08:13:12,603 - WARNING - Image was garbage collected, re-pulling: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:13:22,161 - INFO - Re-pulled image: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:13:22,569 - INFO - Container started: 86ef2cb4e9c7b8f445dc99003993e7299ea5f6036787005b586ee57fa6fde7bc
+2026-02-11 08:13:22,569 - INFO - Running repo setup at runtime...
+2026-02-11 08:13:22,611 - ERROR - Error during repo setup: 404 Client Error for http://docker-service:2375/v1.53/exec/1d8208ad96bee8f463a516d2c6bc395fcd2b4e40ab1feb561e6b62b296544545/json: Not Found ("No such exec instance: 1d8208ad96bee8f463a516d2c6bc395fcd2b4e40ab1feb561e6b62b296544545")
+2026-02-11 08:13:22,611 - WARNING - Container start attempt 2 failed: Failed to run repo setup
+2026-02-11 08:13:26,615 - INFO - Starting container (attempt 3/5): swt-jie.zhang-sympy__sympy-13031-ec17f7
+2026-02-11 08:13:26,619 - WARNING - Image was garbage collected, re-pulling: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:13:34,835 - INFO - Re-pulled image: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 08:13:35,358 - INFO - Container started: 0f1c876f6d7e7e4486fee08da74d15ff825efdcdff07b01a68d3f49deacf4044
+2026-02-11 08:13:35,358 - INFO - Running repo setup at runtime...
+2026-02-11 08:13:35,480 - ERROR - Error during repo setup: 404 Client Error for http://docker-service:2375/v1.53/exec/3b624888470d9b635162405b0b8babf6432f61c5a40bb8ec8db48f788a0d93d4/json: Not Found ("No such exec instance: 3b624888470d9b635162405b0b8babf6432f61c5a40bb8ec8db48f788a0d93d4")
+2026-02-11 08:13:35,480 - WARNING - Container start attempt 3 failed: Failed to run repo setup
+2026-02-11 11:42:58,596 - INFO - Starting test generation for sympy__sympy-13031 using SWT-bench containers
+2026-02-11 11:42:58,596 - INFO - Detected language: python
+2026-02-11 11:42:58,596 - INFO - Using Docker mode (runtime setup) for sympy__sympy-13031
+2026-02-11 11:42:58,644 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 11:42:58,644 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 11:42:59,428 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.deec2122407a414e380748:latest
+2026-02-11 11:42:59,429 - INFO - Starting container (attempt 1/5): swt-jie.zhang-sympy__sympy-13031-4541f8
+2026-02-11 11:42:59,746 - INFO - Container started: 1e543c1d79e9af8af6c232e037d4613ea43098a76a3e8229ee00ba1faa4dfb40
+2026-02-11 11:42:59,746 - INFO - Running repo setup at runtime...
+2026-02-11 11:43:13,721 - INFO - Repo setup completed successfully
+2026-02-11 11:43:13,721 - INFO - === GENERATION PHASE ===
+2026-02-11 11:43:13,721 - INFO - === GENERATION PHASE ===
+2026-02-11 11:45:58,026 - INFO - Generation completed
+2026-02-11 11:45:58,982 - INFO - Found test file at: /testbed/test_reproduce.py
+2026-02-11 11:45:58,982 - INFO - === VALIDATION + REPAIR LOOP ===
+2026-02-11 11:45:59,556 - INFO - Using run command: cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-11 11:45:59,556 - INFO - Validation attempt 1/4
+2026-02-11 11:46:12,989 - INFO - F->P verification PASSED: base_exit=1, head_exit=0
+2026-02-11 11:46:12,989 - INFO - Validation PASSED!
+2026-02-11 11:46:12,996 - INFO - Attempting to stop container swt-jie.zhang-sympy__sympy-13031-4541f8...
+2026-02-11 11:46:28,534 - INFO - Attempting to remove container swt-jie.zhang-sympy__sympy-13031-4541f8...
+2026-02-11 11:46:28,712 - INFO - Container swt-jie.zhang-sympy__sympy-13031-4541f8 removed.

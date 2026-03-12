@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-14774",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.a5ff9a0273d92455aacf8d:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py\n--- a/sympy/printing/latex.py\n+++ b/sympy/printing/latex.py\n@@ -740,7 +740,7 @@ def _print_Function(self, expr, exp=None):\n                 len(args) == 1 and \\\n                 not self._needs_function_brackets(expr.args[0])\n \n-            inv_trig_table = [\"asin\", \"acos\", \"atan\", \"acot\"]\n+            inv_trig_table = [\"asin\", \"acos\", \"atan\", \"acsc\", \"asec\", \"acot\"]\n \n             # If the function is an inverse trig function, handle the style\n             if func in inv_trig_table:\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,38 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with LaTeX printer not supporting full inverse trig function names for acsc and asec.\n+\n+The issue is that latex(acsc(x), inv_trig_style=\"full\") should return\n+'\\\\operatorname{arccsc}{\\\\left (x \\\\right )}' but currently returns\n+'\\\\operatorname{acsc}{\\\\left (x \\\\right )}'\n+\n+Similarly for asec.\n+\"\"\"\n+\n+from sympy import symbols, acsc, asec, asin, latex\n+\n+def test_issue_reproduction():\n+    x = symbols('x')\n+\n+    # Test asin with full style - this should work (baseline)\n+    result_asin = latex(asin(x), inv_trig_style=\"full\")\n+    expected_asin = r'\\arcsin{\\left (x \\right )}'\n+    print(f\"asin test: {result_asin}\")\n+    assert result_asin == expected_asin, f\"Expected '{expected_asin}', got '{result_asin}'\"\n+\n+    # Test acsc with full style - this should fail on buggy version\n+    result_acsc = latex(acsc(x), inv_trig_style=\"full\")\n+    expected_acsc = r'\\operatorname{arccsc}{\\left (x \\right )}'\n+    print(f\"acsc test: {result_acsc}\")\n+    assert result_acsc == expected_acsc, f\"Expected '{expected_acsc}', got '{result_acsc}'\"\n+\n+    # Test asec with full style - this should also fail on buggy version\n+    result_asec = latex(asec(x), inv_trig_style=\"full\")\n+    expected_asec = r'\\operatorname{arccsc}{\\left (x \\right )}'.replace('csc', 'sec')\n+    print(f\"asec test: {result_asec}\")\n+    assert result_asec == expected_asec, f\"Expected '{expected_asec}', got '{result_asec}'\"\n+\n+    print(\"All tests passed - issue is fixed\")\n+\n+if __name__ == \"__main__\":\n+    test_issue_reproduction()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

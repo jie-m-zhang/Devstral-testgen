@@ -1,0 +1,14 @@
+{
+  "instance_id": "pytest-dev__pytest-5221",
+  "base_image": "exec.eval.x86_64.09889d34f5e9cb2bb80279.6c6953be54a58e81ef919c:latest",
+  "test_commands": [],
+  "new_patch": "diff --git a/src/_pytest/python.py b/src/_pytest/python.py\n--- a/src/_pytest/python.py\n+++ b/src/_pytest/python.py\n@@ -1342,17 +1342,19 @@ def _showfixtures_main(config, session):\n                 currentmodule = module\n         if verbose <= 0 and argname[0] == \"_\":\n             continue\n+        tw.write(argname, green=True)\n+        if fixturedef.scope != \"function\":\n+            tw.write(\" [%s scope]\" % fixturedef.scope, cyan=True)\n         if verbose > 0:\n-            funcargspec = \"%s -- %s\" % (argname, bestrel)\n-        else:\n-            funcargspec = argname\n-        tw.line(funcargspec, green=True)\n+            tw.write(\" -- %s\" % bestrel, yellow=True)\n+        tw.write(\"\\n\")\n         loc = getlocation(fixturedef.func, curdir)\n         doc = fixturedef.func.__doc__ or \"\"\n         if doc:\n             write_docstring(tw, doc)\n         else:\n             tw.line(\"    %s: no docstring available\" % (loc,), red=True)\n+        tw.line()\n \n \n def write_docstring(tw, doc, indent=\"    \"):\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,30 @@\n+import pytest\n+\n+@pytest.fixture(scope=\"function\")\n+def func_fixture():\n+    \"\"\"A function-scoped fixture.\"\"\"\n+    return \"function\"\n+\n+@pytest.fixture(scope=\"module\")\n+def module_fixture():\n+    \"\"\"A module-scoped fixture.\"\"\"\n+    return \"module\"\n+\n+@pytest.fixture(scope=\"session\")\n+def session_fixture():\n+    \"\"\"A session-scoped fixture.\"\"\"\n+    return \"session\"\n+\n+@pytest.fixture(scope=\"class\")\n+def class_fixture():\n+    \"\"\"A class-scoped fixture.\"\"\"\n+    return \"class\"\n+\n+@pytest.fixture(scope=\"package\")\n+def package_fixture():\n+    \"\"\"A package-scoped fixture.\"\"\"\n+    return \"package\"\n+\n+def test_example(func_fixture, module_fixture, session_fixture, class_fixture, package_fixture):\n+    \"\"\"Test that uses all fixtures.\"\"\"\n+    pass",
+  "success": false,
+  "validation_passed": false,
+  "repair_attempts": 4,
+  "exception": "PASSES_ON_BASE",
+  "language": "python",
+  "pre_patch_exit_code": 0,
+  "post_patch_exit_code": 0
+}

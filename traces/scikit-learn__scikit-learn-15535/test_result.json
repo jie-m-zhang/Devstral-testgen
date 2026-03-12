@@ -1,0 +1,16 @@
+{
+  "instance_id": "scikit-learn__scikit-learn-15535",
+  "base_image": "exec.eval.x86_64.437918b9cd24690e5e9c56.0eb800dd2cfe98f70898e8:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sklearn/metrics/cluster/_supervised.py b/sklearn/metrics/cluster/_supervised.py\n--- a/sklearn/metrics/cluster/_supervised.py\n+++ b/sklearn/metrics/cluster/_supervised.py\n@@ -43,10 +43,10 @@ def check_clusterings(labels_true, labels_pred):\n         The predicted labels.\n     \"\"\"\n     labels_true = check_array(\n-        labels_true, ensure_2d=False, ensure_min_samples=0\n+        labels_true, ensure_2d=False, ensure_min_samples=0, dtype=None,\n     )\n     labels_pred = check_array(\n-        labels_pred, ensure_2d=False, ensure_min_samples=0\n+        labels_pred, ensure_2d=False, ensure_min_samples=0, dtype=None,\n     )\n \n     # input checks\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,42 @@\n+\"\"\"Test to reproduce the regression in input validation of clustering metrics.\"\"\"\n+import numpy as np\n+from sklearn.metrics.cluster import mutual_info_score\n+\n+def test_mutual_info_score_with_object_dtype():\n+    \"\"\"\n+    Test that mutual_info_score works with string data with object dtype.\n+\n+    This test reproduces the issue where mutual_info_score raises ValueError\n+    when given string data with .astype(object), but works without it.\n+\n+    The issue is that check_array was trying to convert object arrays to float,\n+    which fails for strings. The fix is to pass dtype=None to check_array.\n+    \"\"\"\n+    # Create string data with object dtype (this should work)\n+    x = np.random.choice(['a', 'b'], size=20).astype(object)\n+\n+    # This should not raise ValueError\n+    # On the buggy version, this will raise: ValueError: could not convert string to float: 'b'\n+    # On the fixed version, this will work correctly\n+    try:\n+        result = mutual_info_score(x, x)\n+        # If we get here, the test passes (issue is fixed)\n+        print(f\"Test passed - mutual_info_score returned: {result}\")\n+        assert isinstance(result, (float, np.floating)), f\"Expected float, got {type(result)}\"\n+        assert result >= 0.0, f\"Expected non-negative result, got {result}\"\n+        return True\n+    except ValueError as e:\n+        # If we get a ValueError about converting string to float, the bug is present\n+        if \"could not convert string to float\" in str(e):\n+            print(f\"Test failed (bug present) - ValueError: {e}\")\n+            return False\n+        else:\n+            # Some other ValueError - re-raise it\n+            raise\n+\n+if __name__ == \"__main__\":\n+    success = test_mutual_info_score_with_object_dtype()\n+    if not success:\n+        exit(1)  # Exit with non-zero code to indicate failure\n+    else:\n+        exit(0)  # Exit with zero code to indicate success",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

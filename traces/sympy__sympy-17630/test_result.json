@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-17630",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.ccd3c37b4f048581c1a5e7:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/matrices/expressions/matexpr.py b/sympy/matrices/expressions/matexpr.py\n--- a/sympy/matrices/expressions/matexpr.py\n+++ b/sympy/matrices/expressions/matexpr.py\n@@ -627,6 +627,8 @@ def _postprocessor(expr):\n                 # manipulate them like non-commutative scalars.\n                 return cls._from_args(nonmatrices + [mat_class(*matrices).doit(deep=False)])\n \n+        if mat_class == MatAdd:\n+            return mat_class(*matrices).doit(deep=False)\n         return mat_class(cls._from_args(nonmatrices), *matrices).doit(deep=False)\n     return _postprocessor\n \n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,50 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with BlockMatrix containing ZeroMatrix blocks.\n+\n+The issue is that when multiplying a BlockMatrix with ZeroMatrix blocks,\n+the ZeroMatrix objects get converted to Zero objects (which don't have a 'cols' attribute),\n+causing an AttributeError when trying to access the 'cols' attribute.\n+\"\"\"\n+\n+from sympy import MatrixSymbol, ZeroMatrix, BlockMatrix, block_collapse\n+\n+def test_blockmatrix_zeromatrix_multiply():\n+    \"\"\"Test that multiplying BlockMatrix with ZeroMatrix blocks works correctly.\"\"\"\n+    # Create a block matrix with zero blocks\n+    a = MatrixSymbol(\"a\", 2, 2)\n+    z = ZeroMatrix(2, 2)\n+    b = BlockMatrix([[a, z], [z, z]])\n+\n+    # This should work without error\n+    try:\n+        result = block_collapse(b * b * b)\n+        print(\"block_collapse(b * b * b) succeeded\")\n+        return True\n+    except AttributeError as e:\n+        if \"'Zero' object has no attribute 'cols'\" in str(e):\n+            print(f\"Test failed with expected error: {e}\")\n+            return False\n+        else:\n+            raise\n+\n+if __name__ == \"__main__\":\n+    print(\"Testing BlockMatrix with ZeroMatrix blocks...\")\n+    print(\"=\" * 60)\n+\n+    print(\"\\nTest: block_collapse multiplication\")\n+    print(\"-\" * 60)\n+    try:\n+        result = test_blockmatrix_zeromatrix_multiply()\n+        if not result:\n+            print(\"\u2717 Test FAILED\")\n+            exit(1)\n+        else:\n+            print(\"\u2713 Test PASSED\")\n+    except Exception as e:\n+        print(f\"\u2717 Test FAILED with error: {e}\")\n+        exit(1)\n+\n+    print(\"\\n\" + \"=\" * 60)\n+    print(\"All tests passed - issue is fixed!\")\n+    print(\"=\" * 60)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

@@ -1,0 +1,16 @@
+{
+  "instance_id": "pytest-dev__pytest-7168",
+  "base_image": "exec.eval.x86_64.bfa0b4daea744b5aaefba0.e5c37915ba0feb81b13141:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/src/_pytest/_io/saferepr.py b/src/_pytest/_io/saferepr.py\n--- a/src/_pytest/_io/saferepr.py\n+++ b/src/_pytest/_io/saferepr.py\n@@ -20,7 +20,7 @@ def _format_repr_exception(exc: BaseException, obj: Any) -> str:\n     except BaseException as exc:\n         exc_info = \"unpresentable exception ({})\".format(_try_repr_or_str(exc))\n     return \"<[{} raised in repr()] {} object at 0x{:x}>\".format(\n-        exc_info, obj.__class__.__name__, id(obj)\n+        exc_info, type(obj).__name__, id(obj)\n     )\n \n \n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,53 @@\n+\"\"\"\n+Test to reproduce the INTERNALERROR when exception in __repr__ issue.\n+\n+The issue is in saferepr.py's _format_repr_exception function.\n+On the buggy version, it tries to access obj.__class__.__name__ which triggers\n+__getattribute__ and causes a RuntimeError: No active exception to reraise.\n+On the fixed version, it uses type(obj).__name__ which doesn't trigger __getattribute__.\n+\"\"\"\n+\n+import sys\n+sys.path.insert(0, '/testbed/src')\n+\n+from _pytest._io.saferepr import saferepr\n+\n+class SomeClass:\n+    def __getattribute__(self, attr):\n+        raise RuntimeError(\"Exception in __getattribute__\")\n+\n+    def __repr__(self):\n+        raise RuntimeError(\"Exception in __repr__\")\n+\n+def test_reproduce_issue():\n+    \"\"\"\n+    This test directly exercises the saferepr functionality.\n+    On the buggy version, saferepr will crash when trying to format the object.\n+    On the fixed version, saferepr will handle it gracefully.\n+    \"\"\"\n+    obj = SomeClass()\n+\n+    # This should work on the fixed version but crash on the buggy version\n+    try:\n+        result = saferepr(obj)\n+        # On the fixed version, we should get a string representation\n+        assert isinstance(result, str), f\"Expected string, got {type(result)}\"\n+        assert \"SomeClass\" in result, f\"Expected 'SomeClass' in result, got: {result}\"\n+        print(f\"SUCCESS: saferepr handled the object correctly: {result}\")\n+        return 0\n+    except RuntimeError as e:\n+        # On the buggy version, we'll get a RuntimeError: No active exception to reraise\n+        if \"No active exception to reraise\" in str(e):\n+            print(f\"FAILED: Buggy behavior detected - {e}\")\n+            return 1\n+        else:\n+            # Some other RuntimeError\n+            print(f\"UNEXPECTED: Different RuntimeError - {e}\")\n+            return 1\n+    except Exception as e:\n+        print(f\"UNEXPECTED: Different exception - {type(e).__name__}: {e}\")\n+        return 1\n+\n+if __name__ == \"__main__\":\n+    exit_code = test_reproduce_issue()\n+    sys.exit(exit_code)",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 2,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

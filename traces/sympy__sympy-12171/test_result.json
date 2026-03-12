@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-12171",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.2450efe1261f8ee0bd33e1:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/printing/mathematica.py b/sympy/printing/mathematica.py\n--- a/sympy/printing/mathematica.py\n+++ b/sympy/printing/mathematica.py\n@@ -109,6 +109,9 @@ def _print_Integral(self, expr):\n     def _print_Sum(self, expr):\n         return \"Hold[Sum[\" + ', '.join(self.doprint(a) for a in expr.args) + \"]]\"\n \n+    def _print_Derivative(self, expr):\n+        return \"Hold[D[\" + ', '.join(self.doprint(a) for a in expr.args) + \"]]\"\n+\n \n def mathematica_code(expr, **settings):\n     r\"\"\"Converts an expr to a string of the Wolfram Mathematica code\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,34 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the Mathematica code printer issue with Derivative.\n+\n+This test should:\n+- FAIL on base commit (ca6ef27272be31c9dc3753ede9232c39df9a75d8)\n+- PASS on head commit (50b81f9f6be151014501ffac44e5dc6b2416938f)\n+\"\"\"\n+\n+from sympy import symbols, Function, Derivative, mathematica_code\n+\n+def test_derivative_issue():\n+    \"\"\"Test that Derivative is properly converted to D[...] in Mathematica code.\"\"\"\n+    f = Function('f')\n+    t = symbols('t')\n+\n+    # Test basic derivative\n+    result = mathematica_code(Derivative(f(t), t))\n+    expected = \"Hold[D[f[t], t]]\"\n+    assert result == expected, f\"Expected '{expected}', got '{result}'\"\n+\n+    # Test derivative with multiple variables\n+    x, y = symbols('x y')\n+    g = Function('g')\n+    result2 = mathematica_code(Derivative(g(x, y), x, y))\n+    expected2 = \"Hold[D[g[x, y], x, y]]\"\n+    assert result2 == expected2, f\"Expected '{expected2}', got '{result2}'\"\n+\n+    print(\"\u2713 Derivative test passed\")\n+\n+if __name__ == \"__main__\":\n+    print(\"Testing Mathematica code printer Derivative issue...\")\n+    test_derivative_issue()\n+    print(\"\\nTest passed - Derivative issue is fixed!\")",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

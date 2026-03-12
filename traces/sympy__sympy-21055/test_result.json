@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-21055",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.6718ba46faa39108c6c5b3:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py\n--- a/sympy/assumptions/refine.py\n+++ b/sympy/assumptions/refine.py\n@@ -297,6 +297,28 @@ def refine_im(expr, assumptions):\n         return - S.ImaginaryUnit * arg\n     return _refine_reim(expr, assumptions)\n \n+def refine_arg(expr, assumptions):\n+    \"\"\"\n+    Handler for complex argument\n+\n+    Explanation\n+    ===========\n+\n+    >>> from sympy.assumptions.refine import refine_arg\n+    >>> from sympy import Q, arg\n+    >>> from sympy.abc import x\n+    >>> refine_arg(arg(x), Q.positive(x))\n+    0\n+    >>> refine_arg(arg(x), Q.negative(x))\n+    pi\n+    \"\"\"\n+    rg = expr.args[0]\n+    if ask(Q.positive(rg), assumptions):\n+        return S.Zero\n+    if ask(Q.negative(rg), assumptions):\n+        return S.Pi\n+    return None\n+\n \n def _refine_reim(expr, assumptions):\n     # Helper function for refine_re & refine_im\n@@ -379,6 +401,7 @@ def refine_matrixelement(expr, assumptions):\n     'atan2': refine_atan2,\n     're': refine_re,\n     'im': refine_im,\n+    'arg': refine_arg,\n     'sign': refine_sign,\n     'MatrixElement': refine_matrixelement\n }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,36 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue where refine() does not understand how to simplify complex arguments.\n+\n+The issue is that refine(arg(a), Q.positive(a)) should return 0, but instead returns arg(a).\n+Similarly, refine(arg(a), Q.negative(a)) should return pi, but instead returns arg(a).\n+\"\"\"\n+\n+from sympy import var, arg, Q, refine, S\n+\n+def test_refine_arg_positive():\n+    \"\"\"Test that refine(arg(a), Q.positive(a)) returns 0\"\"\"\n+    a = var('a')\n+    result = refine(arg(a), Q.positive(a))\n+    # On buggy version: result == arg(a)\n+    # On fixed version: result == 0\n+    assert result == S.Zero, f\"Expected S.Zero (0), got {result}\"\n+\n+def test_refine_arg_negative():\n+    \"\"\"Test that refine(arg(a), Q.negative(a)) returns pi\"\"\"\n+    a = var('a')\n+    result = refine(arg(a), Q.negative(a))\n+    # On buggy version: result == arg(a)\n+    # On fixed version: result == pi\n+    assert result == S.Pi, f\"Expected S.Pi (pi), got {result}\"\n+\n+if __name__ == \"__main__\":\n+    print(\"Testing refine(arg(a), Q.positive(a))...\")\n+    test_refine_arg_positive()\n+    print(\"\u2713 Test passed: refine(arg(a), Q.positive(a)) returns 0\")\n+\n+    print(\"\\nTesting refine(arg(a), Q.negative(a))...\")\n+    test_refine_arg_negative()\n+    print(\"\u2713 Test passed: refine(arg(a), Q.negative(a)) returns pi\")\n+\n+    print(\"\\nAll tests passed!\")",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

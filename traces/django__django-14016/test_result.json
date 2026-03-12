@@ -1,0 +1,16 @@
+{
+  "instance_id": "django__django-14016",
+  "base_image": "exec.eval.x86_64.ebed327f02c059ebd6024a.df3923d1416802c4822f00:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/django/db/models/query_utils.py b/django/db/models/query_utils.py\n--- a/django/db/models/query_utils.py\n+++ b/django/db/models/query_utils.py\n@@ -5,7 +5,6 @@\n large and/or so that they can be used by other modules without getting into\n circular import difficulties.\n \"\"\"\n-import copy\n import functools\n import inspect\n from collections import namedtuple\n@@ -46,10 +45,12 @@ def _combine(self, other, conn):\n \n         # If the other Q() is empty, ignore it and just use `self`.\n         if not other:\n-            return copy.deepcopy(self)\n+            _, args, kwargs = self.deconstruct()\n+            return type(self)(*args, **kwargs)\n         # Or if this Q is empty, ignore it and just use `other`.\n         elif not self:\n-            return copy.deepcopy(other)\n+            _, args, kwargs = other.deconstruct()\n+            return type(other)(*args, **kwargs)\n \n         obj = type(self)()\n         obj.connector = conn\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,39 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue with Q objects and non-pickleable types.\n+\n+The issue is that using the | operator on Q objects containing non-pickleable\n+types like dict_keys fails with a TypeError.\n+\"\"\"\n+\n+from django.db.models import Q\n+\n+def test_q_object_pickleable_issue():\n+    \"\"\"\n+    Test that Q objects with non-pickleable types work with | operator.\n+\n+    This test should FAIL on the base commit (1710cdbe79) with:\n+    TypeError: cannot pickle 'dict_keys' object\n+\n+    This test should PASS on the head commit (475cffd1d6) after the fix.\n+    \"\"\"\n+    # Create a Q object with dict_keys (non-pickleable)\n+    q1 = Q(x__in={}.keys())\n+    print(f\"Created Q object: {q1}\")\n+\n+    # Create an empty Q object\n+    q2 = Q()\n+    print(f\"Created empty Q object: {q2}\")\n+\n+    # Try to combine them with | operator - this should fail on base commit\n+    try:\n+        result = q2 | q1\n+        print(f\"Successfully combined Q objects: {result}\")\n+        print(\"Test PASSED - issue is fixed\")\n+    except TypeError as e:\n+        print(f\"Test FAILED with TypeError: {e}\")\n+        print(\"This is expected on the base commit (buggy version)\")\n+        raise\n+\n+if __name__ == \"__main__\":\n+    test_q_object_pickleable_issue()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

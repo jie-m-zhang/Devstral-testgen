@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-13895",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.add241659bb0536a734f66:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/core/numbers.py b/sympy/core/numbers.py\n--- a/sympy/core/numbers.py\n+++ b/sympy/core/numbers.py\n@@ -2248,11 +2248,9 @@ def _eval_power(self, expt):\n         if p is not False:\n             dict = {p[0]: p[1]}\n         else:\n-            dict = Integer(self).factors(limit=2**15)\n+            dict = Integer(b_pos).factors(limit=2**15)\n \n         # now process the dict of factors\n-        if self.is_negative:\n-            dict[-1] = 1\n         out_int = 1  # integer part\n         out_rad = 1  # extracted radicals\n         sqr_int = 1\n@@ -2282,10 +2280,12 @@ def _eval_power(self, expt):\n                     break\n         for k, v in sqr_dict.items():\n             sqr_int *= k**(v//sqr_gcd)\n-        if sqr_int == self and out_int == 1 and out_rad == 1:\n+        if sqr_int == b_pos and out_int == 1 and out_rad == 1:\n             result = None\n         else:\n             result = out_int*out_rad*Pow(sqr_int, Rational(sqr_gcd, expt.q))\n+            if self.is_negative:\n+                result *= Pow(S.NegativeOne, expt)\n         return result\n \n     def _eval_is_prime(self):\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,39 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue where (-x/4 - S(1)/12)**x - 1\n+simplifies to an inequivalent expression.\n+\n+The issue is that simplify() produces an expression that evaluates\n+to a different numerical value than the original expression.\n+\"\"\"\n+\n+from sympy import *\n+\n+def test_issue_reproduction():\n+    x = Symbol('x')\n+    e = (-x/4 - S(1)/12)**x - 1\n+\n+    # Simplify the expression\n+    f = simplify(e)\n+\n+    # Substitute x with S(9)/5 as in the issue\n+    a = S(9)/5\n+    e_subs = e.subs(x, a)\n+    f_subs = f.subs(x, a)\n+\n+    # Get numerical values\n+    e_val = N(e_subs)\n+    f_val = N(f_subs)\n+\n+    print(f\"Original expression value: {e_val}\")\n+    print(f\"Simplified expression value: {f_val}\")\n+\n+    # The values should be equal (or very close)\n+    # On the buggy version, they will be different\n+    # On the fixed version, they should be the same\n+    assert abs(e_val - f_val) < 1e-10, f\"Values differ: {e_val} vs {f_val}\"\n+\n+    print(\"Test passed - issue is fixed\")\n+\n+if __name__ == \"__main__\":\n+    test_issue_reproduction()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}

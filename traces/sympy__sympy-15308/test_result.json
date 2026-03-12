@@ -1,0 +1,16 @@
+{
+  "instance_id": "sympy__sympy-15308",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.1ae8fb279f0f9d4ee9951d:latest",
+  "test_commands": [
+    "cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py"
+  ],
+  "new_patch": "diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py\n--- a/sympy/printing/latex.py\n+++ b/sympy/printing/latex.py\n@@ -289,6 +289,10 @@ def _do_exponent(self, expr, exp):\n         else:\n             return expr\n \n+    def _print_Basic(self, expr):\n+        l = [self._print(o) for o in expr.args]\n+        return self._deal_with_super_sub(expr.__class__.__name__) + r\"\\left(%s\\right)\" % \", \".join(l)\n+\n     def _print_bool(self, e):\n         return r\"\\mathrm{%s}\" % e\n \n@@ -1462,6 +1466,10 @@ def _print_Transpose(self, expr):\n         else:\n             return \"%s^T\" % self._print(mat)\n \n+    def _print_Trace(self, expr):\n+        mat = expr.arg\n+        return r\"\\mathrm{tr}\\left (%s \\right )\" % self._print(mat)\n+\n     def _print_Adjoint(self, expr):\n         mat = expr.arg\n         from sympy.matrices import MatrixSymbol\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,32 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the LaTeX printing issue for Matrix Expression.\n+\n+The issue is that latex(trace(A**2)) returns 'Trace(A**2)' instead of\n+the proper LaTeX format '\\operatorname{tr}\\left(A^{2} \\right)'.\n+\"\"\"\n+\n+from sympy import MatrixSymbol, trace, latex\n+\n+def test_latex_trace_matrix():\n+    \"\"\"Test that LaTeX printing of trace works correctly.\"\"\"\n+    n = 3\n+    A = MatrixSymbol(\"A\", n, n)\n+\n+    # Get the LaTeX representation\n+    result = latex(trace(A**2))\n+\n+    print(f\"Current output: {result}\")\n+\n+    # The expected output should be proper LaTeX with:\n+    # 1. \\operatorname{tr} for the trace function\n+    # 2. A^{2} for the matrix power (not A**2)\n+    expected = r\"\\operatorname{tr}\\left(A^{2} \\right)\"\n+\n+    # This assertion will fail on the buggy version\n+    assert result == expected, f\"Expected '{expected}', got '{result}'\"\n+\n+    print(\"Test passed - LaTeX printing of trace is correct!\")\n+\n+if __name__ == \"__main__\":\n+    test_latex_trace_matrix()",
+  "success": true,
+  "validation_passed": true,
+  "repair_attempts": 0,
+  "exception": null,
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 0
+}
