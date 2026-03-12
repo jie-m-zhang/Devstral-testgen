@@ -1,0 +1,16 @@
+{
+  "instance_id": "pytest-dev__pytest-6116",
+  "base_image": "exec.eval.x86_64.bbbc4277fd8f648e693b98.81edf9e00f8a91f1a378b3:latest",
+  "test_commands": [],
+  "new_patch": "diff --git a/src/_pytest/main.py b/src/_pytest/main.py\n--- a/src/_pytest/main.py\n+++ b/src/_pytest/main.py\n@@ -109,6 +109,7 @@ def pytest_addoption(parser):\n     group.addoption(\n         \"--collectonly\",\n         \"--collect-only\",\n+        \"--co\",\n         action=\"store_true\",\n         help=\"only collect tests, don't execute them.\",\n     ),\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,64 @@\n+#!/usr/bin/env python\n+\"\"\"\n+Test to reproduce the issue: pytest --collect-only needs a one char shortcut command\n+\n+This test verifies that the --co shortcut for --collect-only works by checking\n+the source code directly.\n+\"\"\"\n+\n+import sys\n+import ast\n+import inspect\n+\n+def test_co_shortcut():\n+    \"\"\"\n+    Test that --co is a valid shortcut for --collect-only by inspecting the source code.\n+\n+    This test reads the pytest source code and checks if --co is included in the\n+    addoption call for collectonly.\n+    \"\"\"\n+    # Read the main.py source file\n+    with open('/testbed/src/_pytest/main.py', 'r') as f:\n+        source = f.read()\n+\n+    # Parse the source code\n+    tree = ast.parse(source)\n+\n+    # Find the pytest_addoption function\n+    pytest_addoption_func = None\n+    for node in ast.walk(tree):\n+        if isinstance(node, ast.FunctionDef) and node.name == 'pytest_addoption':\n+            pytest_addoption_func = node\n+            break\n+\n+    if pytest_addoption_func is None:\n+        print(\"FAIL: Could not find pytest_addoption function\")\n+        return False\n+\n+    # Look for the addoption call with --collectonly or --collect-only\n+    co_option_found = False\n+    for node in ast.walk(pytest_addoption_func):\n+        if isinstance(node, ast.Call):\n+            # Check if this is an addoption call\n+            if isinstance(node.func, ast.Attribute) and node.func.attr == 'addoption':\n+                # Check the arguments\n+                for arg in node.args:\n+                    if isinstance(arg, ast.Str) and ('collectonly' in arg.s.lower() or 'collect-only' in arg.s.lower()):\n+                        # This is the collectonly option, check if --co is in the arguments\n+                        for arg in node.args:\n+                            if isinstance(arg, ast.Str) and arg.s == '--co':\n+                                co_option_found = True\n+                                break\n+\n+    if not co_option_found:\n+        print(\"FAIL: --co option not found in collectonly addoption call\")\n+        return False\n+    else:\n+        print(\"PASS: --co option found in collectonly addoption call\")\n+        return True\n+\n+if __name__ == \"__main__\":\n+    success = test_co_shortcut()\n+    if not success:\n+        sys.exit(1)\n+    print(\"Test passed!\")",
+  "success": false,
+  "validation_passed": false,
+  "repair_attempts": 4,
+  "exception": "FAILS_ON_HEAD",
+  "language": "python",
+  "pre_patch_exit_code": 1,
+  "post_patch_exit_code": 1,
+  "pre_patch_coverage": {},
+  "post_patch_coverage": {}
+}

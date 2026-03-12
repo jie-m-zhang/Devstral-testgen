@@ -1,14 +1,48 @@
 {
   "instance_id": "sympy__sympy-20590",
-  "base_image": "exec.eval.x86_64.deec2122407a414e380748.6be69e761c43e05803846d:latest",
+  "base_image": "exec.eval.x86_64.deec2122407a414e380748.0cd9f61b582c959236cab5:latest",
   "test_commands": [],
   "new_patch": "diff --git a/sympy/core/_print_helpers.py b/sympy/core/_print_helpers.py\n--- a/sympy/core/_print_helpers.py\n+++ b/sympy/core/_print_helpers.py\n@@ -17,6 +17,11 @@ class Printable:\n     This also adds support for LaTeX printing in jupyter notebooks.\n     \"\"\"\n \n+    # Since this class is used as a mixin we set empty slots. That means that\n+    # instances of any subclasses that use slots will not need to have a\n+    # __dict__.\n+    __slots__ = ()\n+\n     # Note, we always use the default ordering (lex) in __str__ and __repr__,\n     # regardless of the global setting. See issue 5487.\n     def __str__(self):\n",
-  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,43 @@\n+\"\"\"\n+Test to reproduce the issue where Symbol instances have __dict__ attribute.\n+\n+In version 1.6.2, Symbol instances should not have __dict__ because they use __slots__.\n+In version 1.7, Symbol instances incorrectly have __dict__ due to Printable class\n+not defining __slots__.\n+\n+This test should FAIL on the buggy version (base commit) and PASS on the fixed version (head commit).\n+\"\"\"\n+\n+import sys\n+import sympy\n+\n+def test_symbol_no_dict():\n+    \"\"\"\n+    Test that Symbol instances do not have __dict__ attribute.\n+\n+    Symbol instances should use __slots__ for memory efficiency and should not\n+    have a __dict__ attribute.\n+    \"\"\"\n+    # Create a Symbol instance\n+    s = sympy.Symbol('s')\n+\n+    # Check that the symbol has __slots__ defined\n+    assert hasattr(type(s), '__slots__'), \\\n+        f\"Symbol class should have __slots__ defined, but it doesn't\"\n+\n+    # Check that the symbol instance does NOT have __dict__ attribute\n+    # This is the key assertion that will fail on buggy version\n+    try:\n+        # Try to access __dict__ - this should raise AttributeError\n+        _ = s.__dict__\n+        # If we get here, the bug is present\n+        assert False, \\\n+            f\"Symbol instance should not have __dict__ attribute, but it does: {s.__dict__}\"\n+    except AttributeError:\n+        # This is the expected behavior - __dict__ should not exist\n+        pass\n+\n+    print(\"Test passed - Symbol instances correctly do not have __dict__ attribute\")\n+\n+if __name__ == \"__main__\":\n+    test_symbol_no_dict()",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,42 @@\n+#!/usr/bin/env python3\n+\"\"\"\n+Test to reproduce the issue where Symbol instances have __dict__ in version 1.7+.\n+\n+In version 1.6.2, Symbol instances should not have __dict__ attribute because they use __slots__.\n+This test verifies that Symbol instances do not have __dict__.\n+\"\"\"\n+\n+import sympy\n+\n+def test_symbol_no_dict():\n+    \"\"\"\n+    Test that Symbol instances do not have __dict__ attribute.\n+\n+    This test should:\n+    - FAIL on version 1.7+ (where the bug exists) - Symbol has __dict__\n+    - PASS on version 1.6.2 (where it's correct) - Symbol does not have __dict__\n+    \"\"\"\n+    # Create a Symbol instance\n+    s = sympy.Symbol('s')\n+\n+    # Check that the symbol has __slots__ defined\n+    assert hasattr(type(s), '__slots__'), \"Symbol class should have __slots__ defined\"\n+    print(f\"Symbol class has __slots__: {getattr(type(s), '__slots__', None)}\")\n+\n+    # The critical test: Symbol instances should NOT have __dict__\n+    # In version 1.6.2, this should raise AttributeError\n+    # In version 1.7+, this incorrectly returns an empty dict (the bug)\n+    try:\n+        dict_attr = s.__dict__\n+        # If we get here, the bug exists - Symbol has __dict__\n+        raise AssertionError(f\"Symbol instance should not have __dict__ attribute, but found: {dict_attr}\")\n+    except AttributeError:\n+        # This is the expected behavior - Symbol should not have __dict__\n+        print(\"PASS: Symbol instance correctly does not have __dict__ attribute\")\n+        return True\n+\n+    return False\n+\n+if __name__ == \"__main__\":\n+    test_symbol_no_dict()\n+    print(\"Test completed successfully!\")",
   "success": false,
   "validation_passed": false,
   "repair_attempts": 4,
   "exception": "FAILS_ON_HEAD",
   "language": "python",
   "pre_patch_exit_code": 1,
-  "post_patch_exit_code": 1
+  "post_patch_exit_code": 1,
+  "pre_patch_coverage": {
+    "sympy/core/_print_helpers.py": {
+      "8": 2,
+      "22": 1,
+      "26": 1,
+      "28": 1,
+      "45": 1,
+      "47": 1,
+      "49": 1,
+      "23": 0,
+      "24": 0,
+      "39": 0,
+      "58": 0,
+      "59": 0,
+      "60": 0
+    }
+  },
+  "post_patch_coverage": {
+    "sympy/core/_print_helpers.py": {
+      "8": 2,
+      "22": 1,
+      "26": 1,
+      "28": 1,
+      "45": 1,
+      "47": 1,
+      "49": 1,
+      "23": 0,
+      "24": 0,
+      "39": 0,
+      "58": 0,
+      "59": 0,
+      "60": 0
+    }
+  }
 }

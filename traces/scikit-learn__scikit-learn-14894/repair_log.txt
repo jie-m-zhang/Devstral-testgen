@@ -1,42 +1,549 @@
-2026-02-11 08:10:28,811 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
-2026-02-11 08:10:28,811 - INFO - Detected language: python
-2026-02-11 08:10:28,813 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
-2026-02-11 08:10:28,829 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
-2026-02-11 08:11:13,793 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
-2026-02-11 08:11:13,794 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-16700a
-2026-02-11 08:11:14,464 - INFO - Container started: b153640c58e1cc48b52fb4c161943f7e275cf20686f6f64d34ad8eaf596b621a
-2026-02-11 08:11:14,464 - INFO - Running repo setup at runtime...
-2026-02-11 08:11:14,582 - ERROR - Error during repo setup: 404 Client Error for http://docker-service:2375/v1.53/exec/95e12fc3d3b09e19576545e6aa3242f220145c045112857bf748f22211c13257/json: Not Found ("No such exec instance: 95e12fc3d3b09e19576545e6aa3242f220145c045112857bf748f22211c13257")
-2026-02-11 08:11:14,582 - WARNING - Container start attempt 1 failed: Failed to run repo setup
-2026-02-11 08:11:16,586 - INFO - Starting container (attempt 2/5): swt-jie.zhang-scikit-learn__scikit-dd21f9
-2026-02-11 08:11:16,591 - WARNING - Image was garbage collected, re-pulling: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
-2026-02-11 08:11:40,564 - INFO - Re-pulled image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
-2026-02-11 08:11:41,698 - INFO - Container started: 74fbb9ebb34b7326d429d53bb3fdb0312b35a4d3d4f09d6d045e0eed94e00e99
-2026-02-11 08:11:41,698 - INFO - Running repo setup at runtime...
-2026-02-11 08:11:41,824 - ERROR - Error during repo setup: 404 Client Error for http://docker-service:2375/v1.53/exec/34009a5c3f049f6f6f07a66baa5582e0a8693a668613c0d5e99a28f61144d852/json: Not Found ("No such exec instance: 34009a5c3f049f6f6f07a66baa5582e0a8693a668613c0d5e99a28f61144d852")
-2026-02-11 08:11:41,824 - WARNING - Container start attempt 2 failed: Failed to run repo setup
-2026-02-11 08:11:45,827 - INFO - Starting container (attempt 3/5): swt-jie.zhang-scikit-learn__scikit-5c2c61
-2026-02-11 08:11:46,146 - INFO - Container started: 84261edc59f55cb1b99891ab6750b20b2039744446f3d9272bf93c0909b82623
-2026-02-11 08:11:46,146 - INFO - Running repo setup at runtime...
-2026-02-11 11:39:53,442 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
-2026-02-11 11:39:53,442 - INFO - Detected language: python
-2026-02-11 11:39:53,443 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
-2026-02-11 11:39:53,495 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
-2026-02-11 11:39:53,495 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
-2026-02-11 11:39:54,214 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
-2026-02-11 11:39:54,214 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-2af60b
-2026-02-11 11:39:54,782 - INFO - Container started: 11a257c32eb0f4e3b397045cff1165111390f56e329bb1cd1d91ca299e6f1ea7
-2026-02-11 11:39:54,782 - INFO - Running repo setup at runtime...
-2026-02-11 11:44:36,681 - INFO - Repo setup completed successfully
-2026-02-11 11:44:36,682 - INFO - === GENERATION PHASE ===
-2026-02-11 11:44:36,683 - INFO - === GENERATION PHASE ===
-2026-02-11 11:47:58,033 - INFO - Generation completed
-2026-02-11 11:47:58,684 - INFO - Found test file at: /testbed/test_reproduce.py
-2026-02-11 11:47:58,685 - INFO - === VALIDATION + REPAIR LOOP ===
-2026-02-11 11:47:59,047 - INFO - Using run command: cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
-2026-02-11 11:47:59,047 - INFO - Validation attempt 1/4
-2026-02-11 11:52:25,160 - INFO - F->P verification PASSED: base_exit=1, head_exit=0
-2026-02-11 11:52:25,161 - INFO - Validation PASSED!
-2026-02-11 11:52:25,168 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-2af60b...
-2026-02-11 11:52:41,325 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-2af60b...
-2026-02-11 11:52:41,572 - INFO - Container swt-jie.zhang-scikit-learn__scikit-2af60b removed.
+2026-02-15 00:15:37,303 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 00:15:37,304 - INFO - Coverage tracking enabled for 1 files: ['sklearn/svm/base.py']...
+2026-02-15 00:15:37,304 - INFO - Changed lines: 5 removed, 8 added
+2026-02-15 00:15:37,304 - INFO - Detected language: python
+2026-02-15 00:15:37,304 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 00:15:37,353 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 00:15:37,353 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 00:15:38,128 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 00:15:38,128 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-30fbfe
+2026-02-15 00:16:31,253 - INFO - Container started: a927b94c81d999929e30ed804b69fa57b916f331e120b84be6a51988518ca559
+2026-02-15 00:16:31,254 - INFO - Running repo setup at runtime...
+2026-02-15 00:20:35,533 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 00:20:35,533 - INFO - Coverage tracking enabled for 1 files: ['sklearn/svm/base.py']...
+2026-02-15 00:20:35,533 - INFO - Changed lines: 5 removed, 8 added
+2026-02-15 00:20:35,533 - INFO - Detected language: python
+2026-02-15 00:20:35,534 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 00:20:35,586 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 00:20:35,586 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 00:20:36,224 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 00:20:36,224 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-099c7f
+2026-02-15 00:20:37,014 - INFO - Container started: 26c1778c4402df5adc41cce6a68ca977cd82b2f713b7c35b772b936765dfb100
+2026-02-15 00:20:37,014 - INFO - Running repo setup at runtime...
+2026-02-15 00:23:33,921 - INFO - Repo setup completed successfully
+2026-02-15 00:23:33,922 - INFO - === GENERATION PHASE ===
+2026-02-15 00:23:33,922 - INFO - === GENERATION PHASE ===
+2026-02-15 00:28:44,077 - INFO - Repo setup completed successfully
+2026-02-15 00:28:44,078 - INFO - === GENERATION PHASE ===
+2026-02-15 00:28:44,078 - INFO - === GENERATION PHASE ===
+2026-02-15 00:29:24,165 - INFO - Generation completed
+2026-02-15 00:29:25,734 - INFO - Found test file at: /testbed/test_reproduce.py
+2026-02-15 00:29:25,734 - INFO - === VALIDATION + REPAIR LOOP ===
+2026-02-15 00:29:26,511 - INFO - Using run command: cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-15 00:29:26,511 - INFO - Validation attempt 1/4
+2026-02-15 00:29:26,511 - INFO - Setting up coverage collection with trace.py
+2026-02-15 00:29:27,390 - INFO - Coverage command: python3 /root/trace.py --count -C coverage.cover --include-pattern '/testbed/(sklearn/svm/base\.py)' cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-15 00:33:37,402 - INFO - Pre-patch coverage: 0 files tracked
+2026-02-15 00:33:43,906 - INFO - Generation completed
+2026-02-15 00:33:46,101 - INFO - Found test file at: /testbed/test_reproduce.py
+2026-02-15 00:33:46,101 - INFO - === VALIDATION + REPAIR LOOP ===
+2026-02-15 00:33:47,447 - INFO - Using run command: cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-15 00:33:47,447 - INFO - Validation attempt 1/4
+2026-02-15 00:33:47,449 - INFO - Setting up coverage collection with trace.py
+2026-02-15 00:33:48,415 - INFO - Coverage command: python3 /root/trace.py --count -C coverage.cover --include-pattern '/testbed/(sklearn/svm/base\.py)' cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-15 00:37:16,054 - INFO - Post-patch coverage: 0 files tracked
+2026-02-15 00:37:16,665 - INFO - F->P verification PASSED: base_exit=1, head_exit=0
+2026-02-15 00:37:16,665 - INFO - Validation PASSED!
+2026-02-15 00:37:16,672 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-30fbfe...
+2026-02-15 00:37:21,774 - INFO - Pre-patch coverage: 0 files tracked
+2026-02-15 00:37:54,451 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-30fbfe...
+2026-02-15 00:38:03,757 - INFO - Container swt-jie.zhang-scikit-learn__scikit-30fbfe removed.
+2026-02-15 00:41:20,183 - INFO - Post-patch coverage: 0 files tracked
+2026-02-15 00:41:22,567 - INFO - F->P verification PASSED: base_exit=1, head_exit=0
+2026-02-15 00:41:22,568 - INFO - Validation PASSED!
+2026-02-15 00:41:22,577 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-099c7f...
+2026-02-15 00:41:38,882 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-099c7f...
+2026-02-15 00:41:47,706 - INFO - Container swt-jie.zhang-scikit-learn__scikit-099c7f removed.
+2026-02-15 00:56:51,970 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 00:56:51,971 - INFO - Coverage tracking enabled for 1 files: ['sklearn/svm/base.py']...
+2026-02-15 00:56:51,971 - INFO - Changed lines: 5 removed, 8 added
+2026-02-15 00:56:51,971 - INFO - Detected language: python
+2026-02-15 00:56:51,971 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 00:56:52,010 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 00:56:52,010 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 00:56:52,708 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 00:56:52,708 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-7c7261
+2026-02-15 00:56:55,732 - INFO - Container started: 53316ac98061b446f87ae11bcfa3d8fd50af7249b26ecf7955356371df82f318
+2026-02-15 00:56:55,732 - INFO - Running repo setup at runtime...
+2026-02-15 01:00:46,423 - INFO - Repo setup completed successfully
+2026-02-15 01:00:46,424 - INFO - === GENERATION PHASE ===
+2026-02-15 01:00:46,424 - INFO - === GENERATION PHASE ===
+2026-02-15 01:00:54,160 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:01:03,827 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:01:13,989 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:01:17,989 - WARNING - No valid LLM response after retries on step 1
+2026-02-15 01:01:27,317 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:01:35,634 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:01:45,504 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:01:49,504 - WARNING - No valid LLM response after retries on step 2
+2026-02-15 01:02:00,542 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:02:09,248 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:02:19,527 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:02:23,527 - WARNING - No valid LLM response after retries on step 3
+2026-02-15 01:02:32,273 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:02:41,545 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:02:53,128 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:02:57,128 - WARNING - No valid LLM response after retries on step 4
+2026-02-15 01:03:06,524 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:03:16,801 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:03:24,982 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:03:28,982 - WARNING - No valid LLM response after retries on step 5
+2026-02-15 01:03:36,758 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:03:48,310 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:03:59,412 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:04:03,412 - WARNING - No valid LLM response after retries on step 6
+2026-02-15 01:04:11,355 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:04:22,089 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:04:35,106 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:04:39,106 - WARNING - No valid LLM response after retries on step 7
+2026-02-15 01:04:46,620 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:04:58,252 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:05:08,848 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:05:12,848 - WARNING - No valid LLM response after retries on step 8
+2026-02-15 01:05:21,117 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:05:28,950 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:05:40,987 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:05:44,987 - WARNING - No valid LLM response after retries on step 9
+2026-02-15 01:05:53,139 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:06:04,488 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:06:16,780 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:06:20,780 - WARNING - No valid LLM response after retries on step 10
+2026-02-15 01:06:29,554 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:06:38,766 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:06:50,210 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:06:54,210 - WARNING - No valid LLM response after retries on step 11
+2026-02-15 01:07:00,971 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:07:08,600 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:07:20,384 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:07:24,384 - WARNING - No valid LLM response after retries on step 12
+2026-02-15 01:07:33,730 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:07:43,321 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:07:54,347 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:07:58,347 - WARNING - No valid LLM response after retries on step 13
+2026-02-15 01:08:09,040 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:08:19,214 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:08:29,904 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:08:33,905 - WARNING - No valid LLM response after retries on step 14
+2026-02-15 01:08:43,267 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:08:52,980 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:09:04,402 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:09:08,402 - WARNING - No valid LLM response after retries on step 15
+2026-02-15 01:09:16,159 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:09:25,190 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:09:34,557 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:09:38,557 - WARNING - No valid LLM response after retries on step 16
+2026-02-15 01:09:46,219 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:09:57,553 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:10:10,034 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:10:14,034 - WARNING - No valid LLM response after retries on step 17
+2026-02-15 01:10:21,537 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:10:30,222 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:10:38,424 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:10:42,424 - WARNING - No valid LLM response after retries on step 18
+2026-02-15 01:10:51,814 - WARNING - LLM attempt 1 failed: Object of type Client is not JSON serializable
+2026-02-15 01:11:00,507 - WARNING - LLM attempt 2 failed: Object of type Client is not JSON serializable
+2026-02-15 01:11:10,756 - WARNING - LLM attempt 3 failed: Object of type Client is not JSON serializable
+2026-02-15 01:11:14,756 - WARNING - No valid LLM response after retries on step 19
+2026-02-15 01:11:15,012 - WARNING - Timeout reached
+2026-02-15 01:11:15,015 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-7c7261...
+2026-02-15 01:11:30,346 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-7c7261...
+2026-02-15 01:11:30,507 - INFO - Container swt-jie.zhang-scikit-learn__scikit-7c7261 removed.
+2026-02-15 02:02:03,217 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 02:02:03,217 - INFO - Coverage tracking enabled for 1 files: ['sklearn/svm/base.py']...
+2026-02-15 02:02:03,217 - INFO - Changed lines: 5 removed, 8 added
+2026-02-15 02:02:03,217 - INFO - Detected language: python
+2026-02-15 02:02:03,217 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 02:02:03,390 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:02:03,390 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:02:04,164 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:02:04,165 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-c71f8d
+2026-02-15 02:02:15,738 - INFO - Container started: 5879975ce4eb80aa739d9f752d8a4663018ae3bc1cc91f8ddaa09529c8334516
+2026-02-15 02:02:15,738 - INFO - Running repo setup at runtime...
+2026-02-15 02:11:01,651 - INFO - Repo setup completed successfully
+2026-02-15 02:11:01,651 - INFO - === GENERATION PHASE ===
+2026-02-15 02:11:01,651 - INFO - === GENERATION PHASE ===
+2026-02-15 02:19:01,122 - INFO - Generation completed
+2026-02-15 02:19:04,327 - INFO - Found test file at: /testbed/test_reproduce.py
+2026-02-15 02:19:04,327 - INFO - === VALIDATION + REPAIR LOOP ===
+2026-02-15 02:19:05,335 - INFO - Using run command: cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-15 02:19:05,335 - INFO - Validation attempt 1/4
+2026-02-15 02:19:05,336 - INFO - Setting up coverage collection with trace.py
+2026-02-15 02:19:06,290 - INFO - Coverage command: python3 /root/trace.py --count -C coverage.cover --include-pattern '/testbed/(sklearn/svm/base\.py)' cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-15 02:20:49,467 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 02:20:49,467 - INFO - Coverage tracking enabled for 1 files: ['sklearn/svm/base.py']...
+2026-02-15 02:20:49,467 - INFO - Changed lines: 5 removed, 8 added
+2026-02-15 02:20:49,467 - INFO - Detected language: python
+2026-02-15 02:20:49,468 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 02:20:50,492 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:20:50,492 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:20:51,359 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:20:51,360 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-333965
+2026-02-15 02:20:58,691 - INFO - Container started: 1896ea1336b5d5c1812b55ec160d48a96d70d8aef0ef229f3fcdee4b7814e964
+2026-02-15 02:20:58,691 - INFO - Running repo setup at runtime...
+2026-02-15 02:26:14,777 - INFO - Pre-patch coverage: 0 files tracked
+2026-02-15 02:33:17,435 - INFO - Repo setup completed successfully
+2026-02-15 02:33:17,436 - INFO - === GENERATION PHASE ===
+2026-02-15 02:33:17,436 - INFO - === GENERATION PHASE ===
+2026-02-15 02:35:55,455 - INFO - Post-patch coverage: 0 files tracked
+2026-02-15 02:36:00,499 - INFO - F->P verification PASSED: base_exit=1, head_exit=0
+2026-02-15 02:36:00,499 - INFO - Validation PASSED!
+2026-02-15 02:36:00,506 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-c71f8d...
+2026-02-15 02:36:18,463 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-c71f8d...
+2026-02-15 02:37:18,528 - INFO - Failed to remove container swt-jie.zhang-scikit-learn__scikit-c71f8d: HTTPConnectionPool(host='dind-10.docker-service.tenant-slurm.svc.cluster.local', port=2375): Read timed out. (read timeout=60)
+Traceback (most recent call last):
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 571, in getresponse
+    httplib_response = super().getresponse()
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/util/retry.py", line 490, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 536, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 367, in _raise_timeout
+    raise ReadTimeoutError(
+        self, url, f"Read timed out. (read timeout={timeout_value})"
+    ) from err
+urllib3.exceptions.ReadTimeoutError: HTTPConnectionPool(host='dind-10.docker-service.tenant-slurm.svc.cluster.local', port=2375): Read timed out. (read timeout=60)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/src/docker_utils.py", line 195, in cleanup_container
+    container.remove(force=True)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/models/containers.py", line 367, in remove
+    return self.client.api.remove_container(self.id, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/utils/decorators.py", line 19, in wrapped
+    return f(self, resource_id, *args, **kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/api/container.py", line 1034, in remove_container
+    res = self._delete(
+        self._url("/containers/{0}", container), params=params
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/utils/decorators.py", line 44, in inner
+    return f(self, *args, **kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/api/client.py", line 254, in _delete
+    return self.delete(url, **self._set_request_timeout(kwargs))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/sessions.py", line 671, in delete
+    return self.request("DELETE", url, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/adapters.py", line 690, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPConnectionPool(host='dind-10.docker-service.tenant-slurm.svc.cluster.local', port=2375): Read timed out. (read timeout=60)
+
+2026-02-15 02:40:22,666 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 02:40:22,666 - INFO - Coverage tracking enabled for 1 files: ['sklearn/svm/base.py']...
+2026-02-15 02:40:22,666 - INFO - Changed lines: 5 removed, 8 added
+2026-02-15 02:40:22,667 - INFO - Detected language: python
+2026-02-15 02:40:22,667 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 02:40:26,868 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:40:26,869 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:40:27,837 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:40:27,837 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-30ed46
+2026-02-15 02:40:49,217 - INFO - Container started: d127f20886ca0949f8b48665ecfeac1baffebf415c0eeddcf840e486160b911c
+2026-02-15 02:40:49,218 - INFO - Running repo setup at runtime...
+2026-02-15 02:44:02,008 - WARNING - Timeout reached
+2026-02-15 02:44:02,014 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-333965...
+2026-02-15 02:44:28,663 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-333965...
+2026-02-15 02:45:28,729 - INFO - Failed to remove container swt-jie.zhang-scikit-learn__scikit-333965: HTTPConnectionPool(host='dind-10.docker-service.tenant-slurm.svc.cluster.local', port=2375): Read timed out. (read timeout=60)
+Traceback (most recent call last):
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 571, in getresponse
+    httplib_response = super().getresponse()
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/util/retry.py", line 490, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 536, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 367, in _raise_timeout
+    raise ReadTimeoutError(
+        self, url, f"Read timed out. (read timeout={timeout_value})"
+    ) from err
+urllib3.exceptions.ReadTimeoutError: HTTPConnectionPool(host='dind-10.docker-service.tenant-slurm.svc.cluster.local', port=2375): Read timed out. (read timeout=60)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/src/docker_utils.py", line 195, in cleanup_container
+    container.remove(force=True)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/models/containers.py", line 367, in remove
+    return self.client.api.remove_container(self.id, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/utils/decorators.py", line 19, in wrapped
+    return f(self, resource_id, *args, **kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/api/container.py", line 1034, in remove_container
+    res = self._delete(
+        self._url("/containers/{0}", container), params=params
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/utils/decorators.py", line 44, in inner
+    return f(self, *args, **kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/api/client.py", line 254, in _delete
+    return self.delete(url, **self._set_request_timeout(kwargs))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/sessions.py", line 671, in delete
+    return self.request("DELETE", url, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/adapters.py", line 690, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPConnectionPool(host='dind-10.docker-service.tenant-slurm.svc.cluster.local', port=2375): Read timed out. (read timeout=60)
+
+2026-02-15 02:47:31,358 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 02:47:31,358 - INFO - Coverage tracking enabled for 1 files: ['sklearn/svm/base.py']...
+2026-02-15 02:47:31,358 - INFO - Changed lines: 5 removed, 8 added
+2026-02-15 02:47:31,358 - INFO - Detected language: python
+2026-02-15 02:47:31,359 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 02:47:31,491 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:47:31,491 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:47:32,269 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:47:32,269 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-4f531b
+2026-02-15 02:47:40,928 - INFO - Container started: bdb216e6c85d94a9c13e4e152ea6ca38be08028546b9252eeb3d55de64765490
+2026-02-15 02:47:40,928 - INFO - Running repo setup at runtime...
+2026-02-15 02:54:25,266 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 02:54:25,266 - INFO - Coverage tracking enabled for 1 files: ['sklearn/svm/base.py']...
+2026-02-15 02:54:25,266 - INFO - Changed lines: 5 removed, 8 added
+2026-02-15 02:54:25,266 - INFO - Detected language: python
+2026-02-15 02:54:25,267 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 02:54:25,363 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:54:25,363 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:54:26,530 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 02:54:26,530 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-19e77b
+2026-02-15 02:54:47,574 - INFO - Container started: b54ac40bbb50ca132c8326a7eb92c2e33cffb912ac690990d6f9e71448314b92
+2026-02-15 02:54:47,575 - INFO - Running repo setup at runtime...
+2026-02-15 02:57:32,673 - INFO - Repo setup completed successfully
+2026-02-15 02:57:32,674 - INFO - === GENERATION PHASE ===
+2026-02-15 02:57:32,674 - INFO - === GENERATION PHASE ===
+2026-02-15 03:04:37,165 - INFO - Repo setup completed successfully
+2026-02-15 03:04:37,165 - INFO - === GENERATION PHASE ===
+2026-02-15 03:04:37,166 - INFO - === GENERATION PHASE ===
+2026-02-15 03:09:40,449 - WARNING - Timeout reached
+2026-02-15 03:09:40,455 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-30ed46...
+2026-02-15 03:10:13,177 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-30ed46...
+2026-02-15 03:11:13,250 - INFO - Failed to remove container swt-jie.zhang-scikit-learn__scikit-30ed46: HTTPConnectionPool(host='dind-10.docker-service.tenant-slurm.svc.cluster.local', port=2375): Read timed out. (read timeout=60)
+Traceback (most recent call last):
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 534, in _make_request
+    response = conn.getresponse()
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connection.py", line 571, in getresponse
+    httplib_response = super().getresponse()
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/http/client.py", line 1430, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/mnt/vast/uv-pythons/pythons/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/util/retry.py", line 490, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 536, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/urllib3/connectionpool.py", line 367, in _raise_timeout
+    raise ReadTimeoutError(
+        self, url, f"Read timed out. (read timeout={timeout_value})"
+    ) from err
+urllib3.exceptions.ReadTimeoutError: HTTPConnectionPool(host='dind-10.docker-service.tenant-slurm.svc.cluster.local', port=2375): Read timed out. (read timeout=60)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/src/docker_utils.py", line 195, in cleanup_container
+    container.remove(force=True)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/models/containers.py", line 367, in remove
+    return self.client.api.remove_container(self.id, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/utils/decorators.py", line 19, in wrapped
+    return f(self, resource_id, *args, **kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/api/container.py", line 1034, in remove_container
+    res = self._delete(
+        self._url("/containers/{0}", container), params=params
+    )
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/utils/decorators.py", line 44, in inner
+    return f(self, *args, **kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/docker/api/client.py", line 254, in _delete
+    return self.delete(url, **self._set_request_timeout(kwargs))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/sessions.py", line 671, in delete
+    return self.request("DELETE", url, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/mnt/vast/home/jie.zhang/workspace/projects/swt-bench/.venv/lib/python3.13/site-packages/requests/adapters.py", line 690, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPConnectionPool(host='dind-10.docker-service.tenant-slurm.svc.cluster.local', port=2375): Read timed out. (read timeout=60)
+
+2026-02-15 03:13:30,502 - INFO - Repo setup completed successfully
+2026-02-15 03:13:30,503 - INFO - === GENERATION PHASE ===
+2026-02-15 03:13:30,503 - INFO - === GENERATION PHASE ===
+2026-02-15 03:15:55,583 - WARNING - Timeout reached
+2026-02-15 03:15:55,588 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-4f531b...
+2026-02-15 03:16:17,902 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-4f531b...
+2026-02-15 03:16:21,503 - INFO - Container swt-jie.zhang-scikit-learn__scikit-4f531b removed.
+2026-02-15 03:23:47,426 - WARNING - Timeout reached
+2026-02-15 03:23:47,432 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-19e77b...
+2026-02-15 03:24:33,329 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-19e77b...
+2026-02-15 03:24:34,483 - INFO - Container swt-jie.zhang-scikit-learn__scikit-19e77b removed.
+2026-02-15 12:46:46,173 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 12:46:46,173 - INFO - Detected language: python
+2026-02-15 12:46:46,175 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 12:46:46,220 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 12:46:46,220 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 12:46:46,983 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 12:46:46,983 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-53fea4
+2026-02-15 12:46:47,631 - INFO - Container started: f8b098c7dc4fc10dbec46a403e89f4b05da4f72fabd936c6fd831036740820bc
+2026-02-15 12:46:47,631 - INFO - Running repo setup at runtime...
+2026-02-15 12:51:29,370 - INFO - Repo setup completed successfully
+2026-02-15 12:51:29,371 - INFO - === GENERATION PHASE ===
+2026-02-15 12:51:29,371 - INFO - === GENERATION PHASE ===
+2026-02-15 12:54:59,710 - INFO - Generation completed
+2026-02-15 12:55:00,858 - INFO - Found test file at: /testbed/test_reproduce.py
+2026-02-15 12:55:00,859 - INFO - === VALIDATION + REPAIR LOOP ===
+2026-02-15 12:55:01,416 - INFO - Using run command: cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-15 12:55:01,416 - INFO - Validation attempt 1/4
+2026-02-15 12:55:01,831 - INFO - Coverage setup: trace.py copied to container
+2026-02-15 12:55:01,831 - INFO - Coverage command: cd /testbed && pip install -e . -q 2>/dev/null; python3 /root/trace.py --count -C coverage.cover --i...
+2026-02-15 12:58:07,887 - INFO - Pre-patch coverage: 1 files tracked
+2026-02-15 13:01:14,134 - INFO - F->P verification PASSED: base_exit=1, head_exit=0
+2026-02-15 13:01:14,135 - INFO - Validation PASSED!
+2026-02-15 13:01:14,143 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-53fea4...
+2026-02-15 13:01:29,988 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-53fea4...
+2026-02-15 13:01:30,329 - INFO - Container swt-jie.zhang-scikit-learn__scikit-53fea4 removed.
+2026-02-15 14:59:45,406 - INFO - Starting test generation for scikit-learn__scikit-learn-14894 using SWT-bench containers
+2026-02-15 14:59:45,406 - INFO - Detected language: python
+2026-02-15 14:59:45,407 - INFO - Using Docker mode (runtime setup) for scikit-learn__scikit-learn-14894
+2026-02-15 14:59:45,464 - INFO - Found local registry image: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 14:59:45,464 - INFO - Pulling from registry: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 14:59:46,132 - INFO - Successfully pulled: ghcr.io/mistralai/exec.env.x86_64.437918b9cd24690e5e9c56:latest
+2026-02-15 14:59:46,132 - INFO - Starting container (attempt 1/5): swt-jie.zhang-scikit-learn__scikit-28fcb6
+2026-02-15 14:59:46,549 - INFO - Container started: 616fdf051de114cbd2e2b1b1501d7ab2003e4ef71dfa4ae21f31f262c276c546
+2026-02-15 14:59:46,549 - INFO - Running repo setup at runtime...
+2026-02-15 15:03:51,257 - INFO - Repo setup completed successfully
+2026-02-15 15:03:51,258 - INFO - === GENERATION PHASE ===
+2026-02-15 15:03:51,258 - INFO - === GENERATION PHASE ===
+2026-02-15 15:04:09,791 - INFO - Generation completed
+2026-02-15 15:04:10,463 - INFO - Found test file at: /testbed/test_reproduce.py
+2026-02-15 15:04:10,463 - INFO - === VALIDATION + REPAIR LOOP ===
+2026-02-15 15:04:10,802 - INFO - Using run command: cd /testbed && pip install -e . -q 2>/dev/null; python test_reproduce.py...
+2026-02-15 15:04:10,803 - INFO - Validation attempt 1/4
+2026-02-15 15:04:11,194 - INFO - Coverage setup: trace.py copied to container
+2026-02-15 15:04:11,194 - INFO - Coverage command: cd /testbed && pip install -e . -q 2>/dev/null; python3 /root/trace.py --count -C coverage.cover --i...
+2026-02-15 15:04:15,343 - INFO - Pre-patch coverage: 1 files tracked
+2026-02-15 15:06:48,839 - INFO - F->P verification PASSED: base_exit=1, head_exit=0
+2026-02-15 15:06:48,840 - INFO - Validation PASSED!
+2026-02-15 15:06:48,848 - INFO - Attempting to stop container swt-jie.zhang-scikit-learn__scikit-28fcb6...
+2026-02-15 15:07:04,538 - INFO - Attempting to remove container swt-jie.zhang-scikit-learn__scikit-28fcb6...
+2026-02-15 15:07:05,655 - INFO - Container swt-jie.zhang-scikit-learn__scikit-28fcb6 removed.

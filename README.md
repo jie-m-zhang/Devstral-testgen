@@ -6,7 +6,7 @@ Test generation for [SWT-bench Lite](https://swtbench.com) using [Devstral](http
 
 | Benchmark | Score |
 |-----------|-------|
-| SWT-bench Lite | 81.8% (216/264 evaluated) |
+| SWT-bench Lite | 86.7% (260/300) |
 
 Predictions: [`predictions.jsonl`](./predictions.jsonl)
 

@@ -1,0 +1,16 @@
+{
+  "instance_id": "psf__requests-863",
+  "base_image": "exec.eval.x86_64.3a9417a9d4b5c62087edb6.f9c825a48927a46fdbefc3:latest",
+  "test_commands": [],
+  "new_patch": "diff --git a/requests/models.py b/requests/models.py\n--- a/requests/models.py\n+++ b/requests/models.py\n@@ -462,8 +462,10 @@ def path_url(self):\n \n     def register_hook(self, event, hook):\n         \"\"\"Properly register a hook.\"\"\"\n-\n-        self.hooks[event].append(hook)\n+        if isinstance(hook, (list, tuple, set)):\n+            self.hooks[event].extend(hook)\n+        else:\n+            self.hooks[event].append(hook)\n \n     def deregister_hook(self, event, hook):\n         \"\"\"Deregister a previously registered hook.\n",
+  "agentless_patch": "diff --git a/test_reproduce.py b/test_reproduce.py\nnew file mode 100644\nindex 0000000..0000000\n--- /dev/null\n+++ b/test_reproduce.py\n@@ -0,0 +1,29 @@\n+#!/usr/bin/env python\n+import re\n+\n+# Read the file\n+with open('/testbed/requests/models.py', 'r') as f:\n+    content = f.read()\n+\n+# Find and replace the register_hook method\n+old_method = '''    def register_hook(self, event, hook):\n+        \\\"\\\"\\\"Properly register a hook.\\\"\\\"\\\"\n+\n+        self.hooks[event].append(hook)'''\n+\n+new_method = '''    def register_hook(self, event, hook):\n+        \\\"\\\"\\\"Properly register a hook.\\\"\\\"\\\"\n+\n+        if isinstance(hook, (list, tuple, set)):\n+            self.hooks[event].extend(hook)\n+        else:\n+            self.hooks[event].append(hook)'''\n+\n+# Replace\n+content = content.replace(old_method, new_method)\n+\n+# Write back\n+with open('/testbed/requests/models.py', 'w') as f:\n+    f.write(content)\n+\n+print(\"Fix applied successfully!\")",
+  "success": false,
+  "validation_passed": false,
+  "repair_attempts": 4,
+  "exception": "PASSES_ON_BASE",
+  "language": "python",
+  "pre_patch_exit_code": 0,
+  "post_patch_exit_code": 0,
+  "pre_patch_coverage": {},
+  "post_patch_coverage": {}
+}
